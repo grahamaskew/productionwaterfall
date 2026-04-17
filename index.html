@@ -18,7 +18,7 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden;}
   body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,#6687e1 1px,transparent 1px);background-size:28px 28px;opacity:.07;pointer-events:none;z-index:0;}
-  .container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:48px 32px 80px;}
+  .container{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:48px 32px 80px;}
   .header{margin-bottom:48px;}
   .header-top{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
   .header-logo{width:40px;height:40px;border-radius:50%;object-fit:contain;flex-shrink:0;background:#fff;padding:3px;box-shadow:0 1px 4px rgba(102,135,225,.15);}
@@ -53,7 +53,7 @@
   table{width:100%;border-collapse:collapse;font-size:12px;}
   thead{position:sticky;top:0;z-index:2;}
   thead tr:first-child th{background:var(--surface2);color:var(--accent);font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:10px 14px;text-align:left;font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap;}
-  thead tr:first-child th.month-th{text-align:center;min-width:110px;}
+  thead tr:first-child th.month-th{text-align:center;min-width:85px;}
   thead tr:first-child th.del-th{width:36px;padding:10px 6px;}
   #totalHoursRow{background:var(--bg);}
   #totalHoursRow td{padding:7px 14px;border-bottom:2px solid var(--border);font-size:11px;white-space:nowrap;}
@@ -69,7 +69,7 @@
   .delete-btn{width:24px;height:24px;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--text-muted);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .15s;opacity:0;padding:0;}
   tr:hover .delete-btn{opacity:1;}
   .delete-btn:hover{background:rgba(224,85,85,.10);border-color:rgba(224,85,85,.35);color:var(--danger);}
-  td.month-cell{padding:6px 8px;text-align:center;min-width:110px;}
+  td.month-cell{padding:6px 8px;text-align:center;min-width:85px;}
   .pct-wrap{display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:4px;}
   .pct-input{width:58px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Geist',sans-serif;font-size:11px;color:var(--text);background:var(--surface);text-align:right;-moz-appearance:textfield;transition:border-color .15s;}
   .pct-input::-webkit-inner-spin-button,.pct-input::-webkit-outer-spin-button{-webkit-appearance:none;}
