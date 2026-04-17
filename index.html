@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<\!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,521 +11,125 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f6fb;
-    --surface: #ffffff;
-    --surface2: #edf0f8;
-    --border: #d4daf0;
-    --accent: #6687e1;
-    --accent-dim: #4a6abf;
-    --accent-light: rgba(102,135,225,0.10);
-    --text: #1a1f36;
-    --text-muted: #6b7590;
-    --text-dim: #8892b0;
-    --danger: #e05555;
+    --bg: #f4f6fb; --surface: #ffffff; --surface2: #edf0f8;
+    --border: #d4daf0; --accent: #6687e1; --accent-dim: #4a6abf;
+    --accent-light: rgba(102,135,225,0.10); --text: #1a1f36;
+    --text-muted: #6b7590; --text-dim: #8892b0; --danger: #e05555;
     --radius: 6px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; font-size: 13px; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle, #6687e1 1px, transparent 1px); background-size: 28px 28px; opacity: 0.07; pointer-events: none; z-index: 0; }
+  .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Geist', sans-serif;
-    font-size: 13px;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle, #6687e1 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: 0.07;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 48px 32px 80px;
-  }
-
-  /* ── Header ── */
+  /* Header */
   .header { margin-bottom: 48px; }
-
-  .header-top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 16px;
-  }
-
-  .header-logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: contain;
-    flex-shrink: 0;
-    background: #fff;
-    padding: 3px;
-    box-shadow: 0 1px 4px rgba(102,135,225,0.15);
-  }
-
-  .header-label {
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .header-label::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 1px;
-    background: var(--accent);
-  }
-
-  h1 {
-    font-family: 'Geist', sans-serif;
-    font-size: clamp(36px, 5vw, 56px);
-    font-weight: 600;
-    line-height: 1.05;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
+  .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .header-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: contain; flex-shrink: 0; background: #fff; padding: 3px; box-shadow: 0 1px 4px rgba(102,135,225,0.15); }
+  .header-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .header-label::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--accent); }
+  h1 { font-family: 'Geist', sans-serif; font-size: clamp(36px, 5vw, 56px); font-weight: 600; line-height: 1.05; color: var(--text); letter-spacing: -0.02em; }
   h1 em { font-style: italic; color: var(--accent); }
+  .header-sub { margin-top: 16px; color: var(--text-muted); font-size: 12px; max-width: 480px; line-height: 1.6; }
 
-  .header-sub {
-    margin-top: 16px;
-    color: var(--text-muted);
-    font-size: 12px;
-    max-width: 480px;
-    line-height: 1.6;
-  }
-
-  /* ── Upload zone ── */
-  .upload-zone {
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 56px 32px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: var(--surface);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .upload-zone::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(102,135,225,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .upload-zone:hover, .upload-zone.drag-over {
-    border-color: var(--accent);
-    background: var(--accent-light);
-  }
-
-  .upload-icon {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 20px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent);
-    font-size: 20px;
-  }
-
-  .upload-title {
-    font-size: 22px;
-    color: var(--text);
-    margin-bottom: 8px;
-  }
-
-  .upload-hint {
-    color: var(--text-muted);
-    font-size: 11px;
-    letter-spacing: 0.05em;
-  }
-
+  /* Upload zone */
+  .upload-zone { border: 1px dashed var(--border); border-radius: var(--radius); padding: 56px 32px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--surface); position: relative; overflow: hidden; }
+  .upload-zone::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(102,135,225,0.06) 0%, transparent 70%); pointer-events: none; }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent); background: var(--accent-light); }
+  .upload-icon { width: 48px; height: 48px; margin: 0 auto 20px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 20px; }
+  .upload-title { font-size: 22px; color: var(--text); margin-bottom: 8px; }
+  .upload-hint { color: var(--text-muted); font-size: 11px; letter-spacing: 0.05em; }
   .upload-hint span { color: var(--accent); }
-
   #fileInput { display: none; }
+  .upload-cancel { display: none; text-align: center; margin-top: 16px; }
 
-  .upload-cancel {
-    display: none;
-    text-align: center;
-    margin-top: 16px;
-  }
+  /* Error */
+  .error-box { display: none; background: rgba(224,85,85,0.06); border: 1px solid rgba(224,85,85,0.25); border-radius: var(--radius); padding: 14px 18px; color: var(--danger); margin-top: 16px; font-size: 12px; line-height: 1.5; }
 
-  /* ── Error ── */
-  .error-box {
-    display: none;
-    background: rgba(224,85,85,0.06);
-    border: 1px solid rgba(224,85,85,0.25);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    color: var(--danger);
-    margin-top: 16px;
-    font-size: 12px;
-    line-height: 1.5;
-  }
-
-  /* ── Processing ── */
-  .processing {
-    display: none;
-    text-align: center;
-    padding: 40px;
-    color: var(--text-muted);
-  }
-
-  .spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto 16px;
-  }
-
+  /* Processing */
+  .processing { display: none; text-align: center; padding: 40px; color: var(--text-muted); }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Results ── */
-  .results {
-    display: none;
-    animation: fadeUp 0.4s ease both;
-  }
+  /* Results */
+  .results { display: none; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  /* Pipeline total */
+  .pipeline-total { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; position: relative; overflow: hidden; }
+  .pipeline-total::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+  .total-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .total-value { font-size: 40px; color: var(--accent); letter-spacing: -0.02em; }
 
-  /* ── Pipeline total card ── */
-  .pipeline-total {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px 32px;
-    margin-bottom: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    position: relative;
-    overflow: hidden;
-  }
+  /* Section header */
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .section-title { font-size: 20px; color: var(--text); }
+  .badge { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); padding: 3px 10px; border-radius: 20px; }
 
-  .pipeline-total::after {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--accent);
-  }
-
-  .total-label {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-  }
-
-  .total-value {
-    font-size: 40px;
-    color: var(--accent);
-    letter-spacing: -0.02em;
-  }
-
-  /* ── Section header ── */
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .section-title {
-    font-size: 20px;
-    color: var(--text);
-  }
-
-  .badge {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
-
-  /* ── Table ── */
-  .table-wrap {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: auto;
-    margin-bottom: 32px;
-    max-height: 520px;
-    background: var(--surface);
-  }
-
+  /* Table */
+  .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: auto; margin-bottom: 32px; max-height: 520px; background: var(--surface); }
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
-
   thead { position: sticky; top: 0; z-index: 2; }
-
-  thead tr:first-child th {
-    background: var(--surface2);
-    color: var(--accent);
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 10px 14px;
-    text-align: left;
-    font-weight: 500;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-
+  thead tr:first-child th { background: var(--surface2); color: var(--accent); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 10px 14px; text-align: left; font-weight: 500; border-bottom: 1px solid var(--border); white-space: nowrap; }
   thead tr:first-child th.month-th { text-align: center; min-width: 110px; }
-  thead tr:first-child th.del-th   { width: 36px; padding: 10px 6px; }
+  thead tr:first-child th.del-th { width: 36px; padding: 10px 6px; }
 
-  /* ── Total hours row ── */
+  /* Total hours row */
   #totalHoursRow { background: var(--bg); }
-
-  #totalHoursRow td {
-    padding: 7px 14px;
-    border-bottom: 2px solid var(--border);
-    font-size: 11px;
-    white-space: nowrap;
-  }
-
+  #totalHoursRow td { padding: 7px 14px; border-bottom: 2px solid var(--border); font-size: 11px; white-space: nowrap; }
   #totalHoursRow td.del-spacer { padding: 7px 6px; }
+  .total-row-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .total-hours-cell { text-align: center; font-variant-numeric: tabular-nums; color: var(--accent-dim); font-weight: 600; }
 
-  .total-row-label {
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .total-hours-cell {
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    color: var(--accent-dim);
-    font-weight: 600;
-  }
-
-  /* ── Data rows ── */
-  td {
-    padding: 9px 14px;
-    border-bottom: 1px solid rgba(212,218,240,0.8);
-    color: var(--text-dim);
-    white-space: nowrap;
-  }
-
+  /* Data rows */
+  td { padding: 9px 14px; border-bottom: 1px solid rgba(212,218,240,0.8); color: var(--text-dim); white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--accent-light); color: var(--text); }
-
-  td.num      { text-align: right; font-variant-numeric: tabular-nums; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
   td.currency { text-align: right; font-variant-numeric: tabular-nums; color: var(--accent-dim); font-weight: 500; }
-  td.del-td   { padding: 4px 6px; width: 36px; }
+  td.del-td { padding: 4px 6px; width: 36px; }
 
-  /* ── Delete button ── */
-  .delete-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    opacity: 0;
-    padding: 0;
-  }
-
+  /* Delete button */
+  .delete-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid transparent; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; opacity: 0; padding: 0; }
   tr:hover .delete-btn { opacity: 1; }
+  .delete-btn:hover { background: rgba(224,85,85,0.10); border-color: rgba(224,85,85,0.35); color: var(--danger); }
 
-  .delete-btn:hover {
-    background: rgba(224,85,85,0.10);
-    border-color: rgba(224,85,85,0.35);
-    color: var(--danger);
-  }
-
-  /* ── Month cells ── */
-  td.month-cell {
-    padding: 6px 8px;
-    text-align: center;
-    min-width: 110px;
-  }
-
-  .pct-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    margin-bottom: 4px;
-  }
-
-  .pct-input {
-    width: 58px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 4px 6px;
-    font-family: 'Geist', sans-serif;
-    font-size: 11px;
-    color: var(--text);
-    background: var(--surface);
-    text-align: right;
-    -moz-appearance: textfield;
-    transition: border-color 0.15s;
-  }
-
-  .pct-input::-webkit-inner-spin-button,
-  .pct-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-
+  /* Month cells */
+  td.month-cell { padding: 6px 8px; text-align: center; min-width: 110px; }
+  .pct-wrap { display: flex; align-items: center; justify-content: center; gap: 3px; margin-bottom: 4px; }
+  .pct-input { width: 58px; border: 1px solid var(--border); border-radius: 4px; padding: 4px 6px; font-family: 'Geist', sans-serif; font-size: 11px; color: var(--text); background: var(--surface); text-align: right; -moz-appearance: textfield; transition: border-color 0.15s; }
+  .pct-input::-webkit-inner-spin-button, .pct-input::-webkit-outer-spin-button { -webkit-appearance: none; }
   .pct-input:focus { outline: none; border-color: var(--accent); background: var(--accent-light); }
-
   .pct-suffix { font-size: 10px; color: var(--text-muted); }
-
-  .cell-hours {
-    font-size: 10px;
-    color: var(--text-muted);
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    min-height: 14px;
-  }
-
+  .cell-hours { font-size: 10px; color: var(--text-muted); text-align: center; font-variant-numeric: tabular-nums; min-height: 14px; }
   .cell-hours.has-value { color: var(--accent-dim); font-weight: 500; }
 
-  /* ── Empty state ── */
-  .empty-state {
-    text-align: center;
-    padding: 48px 32px;
-    color: var(--text-muted);
-    font-size: 12px;
-    line-height: 1.8;
-  }
+  /* Empty state */
+  .empty-state { text-align: center; padding: 48px 32px; color: var(--text-muted); font-size: 12px; line-height: 1.8; }
 
-  /* ── Action bar ── */
-  .action-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
+  /* Action bar */
+  .action-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .saved-indicator { margin-left: auto; font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; white-space: nowrap; }
 
-  .saved-indicator {
-    margin-left: auto;
-    font-size: 10px;
-    color: var(--text-muted);
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
-
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: var(--radius);
-    font-family: 'Geist', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.15s ease;
-  }
-
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; }
   .btn-primary { background: var(--accent); color: #fff; font-weight: 500; }
   .btn-primary:hover { background: #8aa3e8; }
-
   .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text-muted); }
   .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
   .btn-reset { background: var(--surface); border-color: rgba(224,85,85,0.3); color: var(--danger); }
   .btn-reset:hover { background: rgba(224,85,85,0.06); border-color: var(--danger); }
-
   .btn-sm { padding: 7px 14px; font-size: 10px; }
-
   .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
 
-  /* ── Row picker ── */
-  .row-picker {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 32px;
-    margin-bottom: 24px;
-    animation: fadeUp 0.3s ease both;
-  }
-
-  .row-picker-icon {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    border: 1px solid var(--border);
-    color: var(--accent);
-    font-size: 18px; font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 14px;
-  }
-
+  /* Row picker */
+  .row-picker { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; animation: fadeUp 0.3s ease both; }
+  .row-picker-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); border: 1px solid var(--border); color: var(--accent); font-size: 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
   .row-picker-title { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-
-  .row-picker-hint {
-    font-size: 12px; color: var(--text-muted);
-    line-height: 1.6; margin-bottom: 20px; max-width: 560px;
-  }
-
+  .row-picker-hint { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; max-width: 560px; }
   .row-picker-hint em { color: var(--accent); font-style: normal; font-weight: 500; }
-
-  .row-picker-list {
-    max-height: 260px; overflow-y: auto;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    margin-bottom: 20px; background: var(--bg);
-  }
-
-  .row-picker-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 9px 14px; border-bottom: 1px solid var(--border);
-    cursor: pointer; font-size: 12px; color: var(--text-dim);
-    transition: background 0.12s;
-  }
-
+  .row-picker-list { max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; background: var(--bg); }
+  .row-picker-item { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 12px; color: var(--text-dim); transition: background 0.12s; }
   .row-picker-item:last-child { border-bottom: none; }
   .row-picker-item:hover, .row-picker-item.selected { background: var(--accent-light); color: var(--text); }
   .row-picker-item input[type="radio"] { accent-color: var(--accent); flex-shrink: 0; }
@@ -533,276 +137,93 @@
   .row-picker-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .row-picker-actions { display: flex; gap: 12px; }
 
-  /* ── Modals ── */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(26,31,54,0.45);
-    backdrop-filter: blur(3px);
-    z-index: 100;
-    align-items: center; justify-content: center;
-    animation: fadeIn 0.2s ease both;
-  }
-
+  /* Modals */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,31,54,0.45); backdrop-filter: blur(3px); z-index: 100; align-items: center; justify-content: center; animation: fadeIn 0.2s ease both; }
   .modal-overlay.show { display: flex; }
-
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 36px 40px;
-    max-width: 460px;
-    width: 90%;
-    box-shadow: 0 16px 48px rgba(26,31,54,0.18);
-    animation: slideUp 0.25s ease both;
-  }
-
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .modal-icon {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: rgba(240,180,60,0.12);
-    border: 1px solid rgba(240,180,60,0.35);
-    color: #c8900a; font-size: 20px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 16px;
-  }
-
-  .modal-icon.danger {
-    background: rgba(224,85,85,0.10);
-    border-color: rgba(224,85,85,0.35);
-    color: var(--danger);
-  }
-
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 36px 40px; max-width: 460px; width: 90%; box-shadow: 0 16px 48px rgba(26,31,54,0.18); animation: slideUp 0.25s ease both; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(240,180,60,0.12); border: 1px solid rgba(240,180,60,0.35); color: #c8900a; font-size: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .modal-icon.danger { background: rgba(224,85,85,0.10); border-color: rgba(224,85,85,0.35); color: var(--danger); }
   .modal-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
-
-  .modal-body {
-    font-size: 13px; color: var(--text-muted);
-    line-height: 1.65; margin-bottom: 24px;
-  }
-
+  .modal-body { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
   .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-  /* ── Setup modal ── */
+  /* Setup modal */
   .setup-modal { max-width: 420px; }
-
   .setup-field { margin-bottom: 20px; }
-
-  .setup-label {
-    display: block;
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--text-muted); margin-bottom: 7px; font-weight: 500;
-  }
-
-  .setup-input {
-    width: 100%;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 9px 12px;
-    font-family: 'Geist', sans-serif; font-size: 13px;
-    color: var(--text); background: var(--surface);
-    transition: border-color 0.15s;
-  }
-
+  .setup-label { display: block; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 7px; font-weight: 500; }
+  .setup-input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; font-family: 'Geist', sans-serif; font-size: 13px; color: var(--text); background: var(--surface); transition: border-color 0.15s; }
   .setup-input:focus { outline: none; border-color: var(--accent); }
-
   input[type="month"] { color-scheme: light; }
-
-  .input-group {
-    display: flex; align-items: stretch;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; background: var(--surface);
-    transition: border-color 0.15s;
-  }
-
+  .input-group { display: flex; align-items: stretch; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); transition: border-color 0.15s; }
   .input-group:focus-within { border-color: var(--accent); }
-
-  .input-group .affix,
-  .input-group .prefix {
-    padding: 9px 11px;
-    background: var(--surface2); color: var(--text-muted);
-    font-size: 12px; font-family: 'Geist', sans-serif;
-    display: flex; align-items: center; flex-shrink: 0;
-  }
-
+  .input-group .affix, .input-group .prefix { padding: 9px 11px; background: var(--surface2); color: var(--text-muted); font-size: 12px; font-family: 'Geist', sans-serif; display: flex; align-items: center; flex-shrink: 0; }
   .input-group .prefix { border-right: 1px solid var(--border); }
-  .input-group .affix  { border-left:  1px solid var(--border); }
-
-  .input-group input {
-    flex: 1; border: none; padding: 9px 12px;
-    font-family: 'Geist', sans-serif; font-size: 13px;
-    color: var(--text); background: transparent; min-width: 0;
-    -moz-appearance: textfield;
-  }
-
-  .input-group input::-webkit-inner-spin-button,
-  .input-group input::-webkit-outer-spin-button { -webkit-appearance: none; }
-
+  .input-group .affix { border-left: 1px solid var(--border); }
+  .input-group input { flex: 1; border: none; padding: 9px 12px; font-family: 'Geist', sans-serif; font-size: 13px; color: var(--text); background: transparent; min-width: 0; -moz-appearance: textfield; }
+  .input-group input::-webkit-inner-spin-button, .input-group input::-webkit-outer-spin-button { -webkit-appearance: none; }
   .input-group input:focus { outline: none; }
-
-  .setup-error {
-    display: none; font-size: 11px; color: var(--danger);
-    margin-top: 14px; padding: 8px 12px;
-    background: rgba(224,85,85,0.06);
-    border: 1px solid rgba(224,85,85,0.2);
-    border-radius: var(--radius);
-  }
-
+  .setup-error { display: none; font-size: 11px; color: var(--danger); margin-top: 14px; padding: 8px 12px; background: rgba(224,85,85,0.06); border: 1px solid rgba(224,85,85,0.2); border-radius: var(--radius); }
   .setup-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
-  /* ── Danger zone ── */
+  /* Danger zone */
   .danger-zone { display: none; }
-
-  .danger-zone-label {
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--danger); font-weight: 500; margin-bottom: 12px;
-  }
-
-  .danger-warning {
-    font-size: 11px; color: var(--text-muted); line-height: 1.55;
-    margin-bottom: 14px; padding: 10px 12px;
-    background: rgba(224,85,85,0.05);
-    border: 1px solid rgba(224,85,85,0.18);
-    border-radius: var(--radius);
-  }
-
+  .danger-zone-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--danger); font-weight: 500; margin-bottom: 12px; }
+  .danger-warning { font-size: 11px; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px; padding: 10px 12px; background: rgba(224,85,85,0.05); border: 1px solid rgba(224,85,85,0.18); border-radius: var(--radius); }
   .danger-actions { display: flex; gap: 10px; }
 
-  @media print {
-    .action-bar, .modal-overlay { display: none !important; }
-    body { background: white; }
-    body::before { display: none; }
-    .pct-input { border: 1px solid #ccc; background: white; }
-  }
-
-  /* ── Login screen ── */
-  #loginScreen {
-    display: none;
-    position: fixed; inset: 0;
-    background: var(--bg);
-    z-index: 200;
-    align-items: center; justify-content: center;
-  }
-
+  /* Login screen */
+  #loginScreen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; align-items: center; justify-content: center; }
   #loginScreen.show { display: flex; }
-
-  .login-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 48px 44px;
-    width: 100%; max-width: 400px;
-    box-shadow: 0 16px 56px rgba(26,31,54,0.12);
-    animation: slideUp 0.3s ease both;
-    position: relative;
-  }
-
-  .login-logo {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 36px;
-  }
-
-  .login-logo img {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: #fff; padding: 2px;
-    box-shadow: 0 1px 4px rgba(102,135,225,0.15);
-    object-fit: contain;
-  }
-
-  .login-logo-label {
-    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--accent);
-  }
-
-  .login-title {
-    font-size: 28px; font-weight: 600; color: var(--text);
-    letter-spacing: -0.02em; margin-bottom: 6px;
-  }
-
+  .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 48px 44px; width: 100%; max-width: 400px; box-shadow: 0 16px 56px rgba(26,31,54,0.12); animation: slideUp 0.3s ease both; }
+  .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; }
+  .login-logo img { width: 36px; height: 36px; border-radius: 50%; background: #fff; padding: 2px; box-shadow: 0 1px 4px rgba(102,135,225,0.15); object-fit: contain; }
+  .login-logo-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); }
+  .login-title { font-size: 28px; font-weight: 600; color: var(--text); letter-spacing: -0.02em; margin-bottom: 6px; }
   .login-title em { font-style: italic; color: var(--accent); }
-
-  .login-subtitle {
-    font-size: 12px; color: var(--text-muted);
-    margin-bottom: 32px; line-height: 1.5;
-  }
-
+  .login-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.5; }
   .login-field { margin-bottom: 18px; }
-
-  .login-label {
-    display: block; font-size: 10px; letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--text-muted);
-    margin-bottom: 7px; font-weight: 500;
-  }
-
-  .login-input {
-    width: 100%; border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 10px 13px;
-    font-family: 'Geist', sans-serif; font-size: 14px;
-    color: var(--text); background: var(--surface);
-    transition: border-color 0.15s;
-  }
-
+  .login-label { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 7px; font-weight: 500; }
+  .login-input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 13px; font-family: 'Geist', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); transition: border-color 0.15s; }
   .login-input:focus { outline: none; border-color: var(--accent); }
-
-  .login-error {
-    display: none; font-size: 11px; color: var(--danger);
-    margin-bottom: 18px; padding: 9px 12px;
-    background: rgba(224,85,85,0.06);
-    border: 1px solid rgba(224,85,85,0.2);
-    border-radius: var(--radius);
-  }
-
-  .login-btn {
-    width: 100%; padding: 12px;
-    background: var(--accent); color: #fff;
-    border: none; border-radius: var(--radius);
-    font-family: 'Geist', sans-serif; font-size: 12px;
-    letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
-    cursor: pointer; transition: background 0.15s;
-    margin-top: 4px;
-  }
-
+  .login-error { display: none; font-size: 11px; color: var(--danger); margin-bottom: 18px; padding: 9px 12px; background: rgba(224,85,85,0.06); border: 1px solid rgba(224,85,85,0.2); border-radius: var(--radius); }
+  .login-btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: 'Geist', sans-serif; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.15s; margin-top: 4px; }
   .login-btn:hover { background: #8aa3e8; }
   .login-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  /* ── User indicator ── */
-  .user-indicator {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 12px;
-  }
-
-  .user-email {
-    font-size: 11px; color: var(--text-muted);
-    letter-spacing: 0.02em;
-  }
-
-  .btn-signout {
-    padding: 6px 14px;
-    font-size: 10px; letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text-muted); border-radius: var(--radius);
-    cursor: pointer; font-family: 'Geist', sans-serif;
-    transition: all 0.15s;
-  }
-
+  /* User indicator */
+  .user-indicator { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .user-email { font-size: 11px; color: var(--text-muted); letter-spacing: 0.02em; }
+  .btn-signout { padding: 6px 14px; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); border-radius: var(--radius); cursor: pointer; font-family: 'Geist', sans-serif; transition: all 0.15s; }
   .btn-signout:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Saving indicator states ── */
-  .saving-indicator {
-    margin-left: auto; font-size: 10px;
-    color: var(--text-muted); letter-spacing: 0.04em; white-space: nowrap;
+  /* Column toggle */
+  .col-toggle-wrap { position: relative; }
+  .col-toggle-panel { display: none; position: absolute; bottom: calc(100% + 10px); left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; box-shadow: 0 8px 32px rgba(26,31,54,0.14); z-index: 50; min-width: 220px; animation: slideUp 0.2s ease both; }
+  .col-toggle-panel.show { display: block; }
+  .col-toggle-title { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; margin-bottom: 12px; }
+  .col-toggle-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); gap: 20px; }
+  .col-toggle-item:last-child { border-bottom: none; }
+  .col-toggle-label { font-size: 12px; color: var(--text); }
+  .toggle-switch { position: relative; width: 32px; height: 18px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track { position: absolute; inset: 0; border-radius: 18px; background: var(--border); cursor: pointer; transition: background 0.2s; }
+  .toggle-track::after { content: ''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 0.2s; }
+  .toggle-switch input:checked + .toggle-track { background: var(--accent); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(14px); }
+
+  @media print {
+    .action-bar, .modal-overlay { display: none \!important; }
+    body { background: white; }
+    body::before { display: none; }
+    .pct-input { border: 1px solid #ccc; background: white; }
   }
 </style>
 </head>
 <body>
 
-<!-- Login screen -->
+<\!-- Login screen -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
@@ -824,9 +245,10 @@
   </div>
 </div>
 
+<\!-- Main app -->
 <div class="container" id="appContainer" style="display:none">
 
-  <!-- Header -->
+  <\!-- Header -->
   <div class="header">
     <div class="header-top">
       <img class="header-logo" src="data:image/webp;base64,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" alt="GA Logo">
@@ -840,21 +262,19 @@
     <p class="header-sub">Upload your estimates workbook to compute accepted items, remaining pipeline value, and projected labour hours by month.</p>
   </div>
 
-  <!-- Upload zone -->
+  <\!-- Upload zone -->
   <div class="upload-zone" id="uploadZone" style="display:none">
     <div class="upload-icon">↑</div>
     <div class="upload-title">Drop your workbook here</div>
     <p class="upload-hint">or <span>click to browse</span> &nbsp;·&nbsp; .xlsx / .xls / .csv accepted</p>
     <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
   </div>
-
   <div class="upload-cancel" id="uploadCancel">
     <button class="btn btn-outline btn-sm" onclick="cancelUpload()">← Back to results</button>
   </div>
-
   <div class="error-box" id="errorBox"></div>
 
-  <!-- Row picker -->
+  <\!-- Row picker -->
   <div class="row-picker" id="rowPicker">
     <div class="row-picker-icon">?</div>
     <div class="row-picker-title">Select the header row</div>
@@ -866,19 +286,16 @@
     </div>
   </div>
 
-  <!-- Setup / Settings modal -->
+  <\!-- Setup / Settings modal -->
   <div class="modal-overlay" id="setupModalOverlay">
     <div class="modal setup-modal">
       <div class="modal-title" id="setupModalTitle">Setup</div>
       <p class="modal-body" id="setupModalDesc" style="margin-bottom:20px;">Configure your waterfall parameters before uploading your workbook.</p>
-
       <div class="setup-field">
         <label class="setup-label" for="setupStartMonth">Start month</label>
         <input type="month" id="setupStartMonth" class="setup-input">
       </div>
-
       <hr class="setup-divider">
-
       <div class="setup-field">
         <label class="setup-label" for="setupLaborMix">Labor mix</label>
         <div class="input-group">
@@ -886,7 +303,6 @@
           <span class="affix">%</span>
         </div>
       </div>
-
       <div class="setup-field">
         <label class="setup-label" for="setupBillableRate">Av. billable rate</label>
         <div class="input-group">
@@ -894,15 +310,11 @@
           <input type="number" id="setupBillableRate" value="150" min="0.01" step="0.01" placeholder="150">
         </div>
       </div>
-
       <div class="setup-error" id="setupError"></div>
-
       <div class="modal-actions" style="margin-top:28px;">
         <button class="btn btn-primary" onclick="saveSetup()">Confirm</button>
         <button class="btn btn-outline" id="setupCancelBtn" style="display:none" onclick="closeSetupModal()">Cancel</button>
       </div>
-
-      <!-- Danger zone — only visible when data exists -->
       <div class="danger-zone" id="dangerZone">
         <hr class="setup-divider" style="margin-top:28px; margin-bottom:20px;">
         <div class="danger-zone-label">Danger zone</div>
@@ -918,7 +330,7 @@
     </div>
   </div>
 
-  <!-- Filter warning modal -->
+  <\!-- Filter warning modal -->
   <div class="modal-overlay" id="filterModalOverlay">
     <div class="modal">
       <div class="modal-icon">⚠</div>
@@ -931,7 +343,7 @@
     </div>
   </div>
 
-  <!-- Percentage warning modal -->
+  <\!-- Percentage warning modal -->
   <div class="modal-overlay" id="pctWarningOverlay">
     <div class="modal">
       <div class="modal-icon">⚠</div>
@@ -943,7 +355,7 @@
     </div>
   </div>
 
-  <!-- Delete row confirmation modal -->
+  <\!-- Delete row confirmation modal -->
   <div class="modal-overlay" id="deleteModalOverlay">
     <div class="modal">
       <div class="modal-icon danger">✕</div>
@@ -956,358 +368,236 @@
     </div>
   </div>
 
-  <!-- Processing -->
+  <\!-- Processing -->
   <div class="processing" id="processing">
     <div class="spinner"></div>
     <div>Processing workbook…</div>
   </div>
 
-  <!-- Results -->
+  <\!-- Results -->
   <div class="results" id="results">
-
     <div class="pipeline-total">
       <div>
         <div class="total-label">Production Pipeline Total</div>
         <div class="total-value" id="pipelineTotal">—</div>
       </div>
     </div>
-
     <div class="section-header">
       <div class="section-title">Production Waterfall</div>
       <span class="badge" id="rowBadge">0 rows</span>
     </div>
-
     <div class="table-wrap">
       <table id="outputTable">
         <thead id="tableHead"></thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-
     <hr class="divider">
     <div class="action-bar">
       <button class="btn btn-outline" onclick="exportCSV()">↓ &nbsp;Export CSV</button>
       <button class="btn btn-outline" onclick="triggerUploadFile()">↑ &nbsp;Upload File</button>
       <button class="btn btn-outline" onclick="openSettingsModal()">⚙ &nbsp;Settings</button>
+      <div class="col-toggle-wrap">
+        <button class="btn btn-outline" onclick="toggleColumnsPanel()">⊞ &nbsp;Columns</button>
+        <div class="col-toggle-panel" id="colTogglePanel"></div>
+      </div>
       <span class="saved-indicator" id="savedIndicator"></span>
     </div>
-
   </div>
 
 </div>
-
 <script>
-// ─── Firebase init ────────────────────────────────────────
+// ── Firebase ──────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "AIzaSyAVSbSpnIkWycBfMkdh0aTXO3HQv7pEfeQ",
-  authDomain:        "production-waterfall.firebaseapp.com",
-  projectId:         "production-waterfall",
-  storageBucket:     "production-waterfall.firebasestorage.app",
+  apiKey: "AIzaSyAVSbSpnIkWycBfMkdh0aTXO3HQv7pEfeQ",
+  authDomain: "production-waterfall.firebaseapp.com",
+  projectId: "production-waterfall",
+  storageBucket: "production-waterfall.firebasestorage.app",
   messagingSenderId: "849888566410",
-  appId:             "1:849888566410:web:e606366fab951560dd2173",
+  appId: "1:849888566410:web:e606366fab951560dd2173",
 };
-
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-// ─── Setup config ─────────────────────────────────────────
+// ── Setup config ──────────────────────────────────────────
 const setupConfig = {
-  startMonth:   null,
-  laborMix:     0.28,
-  billableRate: 150,
-  monthKeys:    [],
-  monthLabels:  [],
+  startMonth: null, laborMix: 0.28, billableRate: 150,
+  monthKeys: [], monthLabels: [], columnVisibility: {},
 };
 
-// ─── Row store ────────────────────────────────────────────
-// { 'NAME___NUM': { name, num, date, amount, invoicedAmount,
-//                  remainingAmount,
-//                  months: { 'YYYY-MM': { pct, laborMix, billableRate } } } }
+// ── Row store ─────────────────────────────────────────────
 let rowStore = {};
 
-// ─── Upload state ─────────────────────────────────────────
-let pendingAllRows    = null;
-let selectedHeaderIdx = null;
-let pendingHeaderIdx  = null;
-let hasHiddenRows     = false;
-let uploadingFromResults = false;  // true when Upload File triggered from results view
+// ── Upload state ──────────────────────────────────────────
+let pendingAllRows = null, selectedHeaderIdx = null,
+    pendingHeaderIdx = null, hasHiddenRows = false,
+    uploadingFromResults = false;
 
-// ─── Delete state ─────────────────────────────────────────
-let pendingDeleteKey = null;
+// ── Delete / save state ───────────────────────────────────
+let pendingDeleteKey = null, saveTimer = null;
 
-// ─── Auto-save timer ──────────────────────────────────────
-let saveTimer = null;
+// ── Toggleable columns ────────────────────────────────────
+const TOGGLEABLE_COLS = ['Name','Num','Date','Amount','Invoiced Amount','Remaining Amount'];
 
-// ─── Auth state listener (replaces DOMContentLoaded init) ─
+function isColVisible(col) {
+  if (\!TOGGLEABLE_COLS.includes(col)) return true;
+  if (\!setupConfig.columnVisibility) return true;
+  return setupConfig.columnVisibility[col] \!== false;
+}
+
+// ── Auth state ────────────────────────────────────────────
 auth.onAuthStateChanged(user => {
   if (user) {
-    // Logged in — show app, hide login screen
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('appContainer').style.display = 'block';
     document.getElementById('userEmailDisplay').textContent = user.email;
     loadUserData(user.uid);
   } else {
-    // Logged out — show login screen, hide app
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('appContainer').style.display = 'none';
-    // Clear in-memory state
     rowStore = {};
-    setupConfig.startMonth   = null;
-    setupConfig.laborMix     = 0.28;
-    setupConfig.billableRate = 150;
-    setupConfig.monthKeys    = [];
-    setupConfig.monthLabels  = [];
+    Object.assign(setupConfig, { startMonth: null, laborMix: 0.28, billableRate: 150, monthKeys: [], monthLabels: [], columnVisibility: {} });
   }
 });
 
-// ─── Login ────────────────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────
 async function signIn() {
-  const email    = document.getElementById('loginEmail').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-  const errEl    = document.getElementById('loginError');
-  const btn      = document.getElementById('loginBtn');
-
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
   errEl.style.display = 'none';
-  if (!email || !password) {
-    errEl.textContent = 'Please enter your email and password.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-
+  if (\!email || \!password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    // onAuthStateChanged will handle the transition
   } catch(e) {
     let msg = 'Sign in failed. Please check your email and password.';
-    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-      msg = 'Incorrect email or password.';
-    } else if (e.code === 'auth/too-many-requests') {
-      msg = 'Too many failed attempts. Please try again later.';
-    } else if (e.code === 'auth/network-request-failed') {
-      msg = 'Network error. Please check your connection.';
-    }
-    errEl.textContent = msg;
-    errEl.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Sign in';
-  }
+    if (['auth/user-not-found','auth/wrong-password','auth/invalid-credential'].includes(e.code)) msg = 'Incorrect email or password.';
+    else if (e.code === 'auth/too-many-requests') msg = 'Too many failed attempts. Please try again later.';
+    else if (e.code === 'auth/network-request-failed') msg = 'Network error. Please check your connection.';
+    errEl.textContent = msg; errEl.style.display = 'block';
+  } finally { btn.disabled = false; btn.textContent = 'Sign in'; }
 }
+document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') signIn(); });
+document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') signIn(); });
 
-// Allow Enter key in login form
-document.getElementById('loginPassword').addEventListener('keydown', e => {
-  if (e.key === 'Enter') signIn();
-});
-document.getElementById('loginEmail').addEventListener('keydown', e => {
-  if (e.key === 'Enter') signIn();
-});
-
-// ─── Sign out ─────────────────────────────────────────────
+// ── Sign out ──────────────────────────────────────────────
 async function signOutUser() {
-  try {
-    clearTimeout(saveTimer);
-    await auth.signOut();
-    // onAuthStateChanged handles the rest
-    document.getElementById('userEmailDisplay').textContent = '';
-    document.getElementById('savedIndicator').textContent   = '';
-    hide('results');
-    hide('uploadZone');
-    hide('processing');
-    document.getElementById('uploadCancel').style.display = 'none';
-    document.getElementById('rowPicker').style.display    = 'none';
-    document.getElementById('tableHead').innerHTML = '';
-    document.getElementById('tableBody').innerHTML = '';
-    document.getElementById('pipelineTotal').textContent = '—';
-  } catch(e) {
-    console.warn('Sign out error:', e);
-  }
+  clearTimeout(saveTimer);
+  await auth.signOut().catch(e => console.warn(e));
+  document.getElementById('userEmailDisplay').textContent = '';
+  document.getElementById('savedIndicator').textContent = '';
+  hide('results'); hide('uploadZone'); hide('processing');
+  document.getElementById('uploadCancel').style.display = 'none';
+  document.getElementById('rowPicker').style.display = 'none';
+  document.getElementById('tableHead').innerHTML = '';
+  document.getElementById('tableBody').innerHTML = '';
+  document.getElementById('pipelineTotal').textContent = '—';
 }
 
-// ─── Firestore: load user data ────────────────────────────
+// ── Firestore load ────────────────────────────────────────
 async function loadUserData(uid) {
   try {
-    const docSnap = await db.collection('users').doc(uid)
-                             .collection('data').doc('appState').get();
-    if (docSnap.exists) {
-      const saved = docSnap.data();
+    const snap = await db.collection('users').doc(uid).collection('data').doc('appState').get();
+    if (snap.exists) {
+      const saved = snap.data();
       if (saved && saved.setupConfig && saved.setupConfig.startMonth) {
         Object.assign(setupConfig, saved.setupConfig);
-        if (!setupConfig.monthKeys || !setupConfig.monthKeys.length) {
+        if (\!setupConfig.columnVisibility) setupConfig.columnVisibility = {};
+        if (\!setupConfig.monthKeys || \!setupConfig.monthKeys.length) {
           const { keys, labels } = generateMonths(setupConfig.startMonth);
-          setupConfig.monthKeys   = keys;
-          setupConfig.monthLabels = labels;
+          setupConfig.monthKeys = keys; setupConfig.monthLabels = labels;
         }
         rowStore = saved.rows || {};
         if (saved.lastSaved) updateSavedIndicator(saved.lastSaved);
-        if (Object.keys(rowStore).length > 0) {
-          renderResults();
-        } else {
-          show('uploadZone');
-        }
-      } else {
-        openSetupModal();
-      }
-    } else {
-      openSetupModal();
-    }
-  } catch(e) {
-    console.error('Could not load data from Firestore:', e);
-    openSetupModal();
-  }
+        if (Object.keys(rowStore).length > 0) renderResults(); else show('uploadZone');
+      } else { openSetupModal(); }
+    } else { openSetupModal(); }
+  } catch(e) { console.error('Firestore load error:', e); openSetupModal(); }
 }
 
-// ─── Firestore: save user data ────────────────────────────
+// ── Firestore save ────────────────────────────────────────
 async function saveToFirestore() {
   const user = auth.currentUser;
-  if (!user) return;
-  const state = {
-    setupConfig: { ...setupConfig },
-    rows:        rowStore,
-    lastSaved:   new Date().toISOString(),
-  };
+  if (\!user) return;
+  const state = { setupConfig: { ...setupConfig }, rows: rowStore, lastSaved: new Date().toISOString() };
   try {
-    await db.collection('users').doc(user.uid)
-            .collection('data').doc('appState').set(state);
+    await db.collection('users').doc(user.uid).collection('data').doc('appState').set(state);
     updateSavedIndicator(state.lastSaved);
-  } catch(e) {
-    console.warn('Could not save to Firestore:', e);
-  }
+  } catch(e) { console.warn('Firestore save error:', e); }
 }
 
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToFirestore, 600);
-}
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveToFirestore, 600); }
 
-// ─── Saved indicator ──────────────────────────────────────
-function updateSavedIndicator(isoString) {
+// ── Saved indicator ───────────────────────────────────────
+function updateSavedIndicator(iso) {
   const el = document.getElementById('savedIndicator');
-  if (!el || !isoString) return;
-  const d    = new Date(isoString);
-  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  el.textContent = '● Saved · ' + time;
+  if (\!el || \!iso) return;
+  const t = new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  el.textContent = '● Saved · ' + t;
 }
 
-// ─── Setup modal ──────────────────────────────────────────
+// ── Setup modal ───────────────────────────────────────────
 function openSetupModal() {
   const hasData = Object.keys(rowStore).length > 0;
-
-  document.getElementById('setupStartMonth').value =
-    setupConfig.startMonth || currentMonthStr();
-  document.getElementById('setupLaborMix').value =
-    (setupConfig.laborMix * 100).toFixed(1).replace(/\.0$/, '');
+  document.getElementById('setupStartMonth').value = setupConfig.startMonth || currentMonthStr();
+  document.getElementById('setupLaborMix').value = (setupConfig.laborMix * 100).toFixed(1).replace(/\.0$/,'');
   document.getElementById('setupBillableRate').value = setupConfig.billableRate;
-
-  document.getElementById('setupError').style.display   = 'none';
+  document.getElementById('setupError').style.display = 'none';
   document.getElementById('setupCancelBtn').style.display = hasData ? 'inline-flex' : 'none';
-  document.getElementById('setupModalTitle').textContent  = hasData ? 'Settings' : 'Setup';
-  document.getElementById('setupModalDesc').textContent   = hasData
+  document.getElementById('setupModalTitle').textContent = hasData ? 'Settings' : 'Setup';
+  document.getElementById('setupModalDesc').textContent = hasData
     ? 'Adjust your waterfall parameters. Labor mix and rate changes apply to new entries only.'
     : 'Configure your waterfall parameters before uploading your workbook.';
-
-  // Danger zone
   document.getElementById('dangerZone').style.display = hasData ? 'block' : 'none';
   document.getElementById('resetConfirmPanel').style.display = 'none';
-  document.getElementById('resetTriggerBtn').style.display   = 'block';
-
+  document.getElementById('resetTriggerBtn').style.display = 'block';
   document.getElementById('setupModalOverlay').classList.add('show');
 }
-
 function openSettingsModal() { openSetupModal(); }
-
-function closeSetupModal() {
-  document.getElementById('setupModalOverlay').classList.remove('show');
-}
+function closeSetupModal() { document.getElementById('setupModalOverlay').classList.remove('show'); }
 
 function saveSetup() {
-  const startMonthVal   = document.getElementById('setupStartMonth').value;
-  const laborMixVal     = parseFloat(document.getElementById('setupLaborMix').value);
+  const startMonthVal = document.getElementById('setupStartMonth').value;
+  const laborMixVal = parseFloat(document.getElementById('setupLaborMix').value);
   const billableRateVal = parseFloat(document.getElementById('setupBillableRate').value);
-
   const errEl = document.getElementById('setupError');
   errEl.style.display = 'none';
-
-  if (!startMonthVal) {
-    errEl.textContent = 'Please select a start month.'; errEl.style.display = 'block'; return;
-  }
-  if (isNaN(laborMixVal) || laborMixVal < 0 || laborMixVal > 100) {
-    errEl.textContent = 'Please enter a valid labor mix between 0 and 100.'; errEl.style.display = 'block'; return;
-  }
-  if (isNaN(billableRateVal) || billableRateVal <= 0) {
-    errEl.textContent = 'Please enter a valid billable rate greater than zero.'; errEl.style.display = 'block'; return;
-  }
-
-  const oldMonthKeys     = [...setupConfig.monthKeys];
-  const startMonthChanged = startMonthVal !== setupConfig.startMonth;
-
-  setupConfig.startMonth   = startMonthVal;
-  setupConfig.laborMix     = laborMixVal / 100;
+  if (\!startMonthVal) { errEl.textContent = 'Please select a start month.'; errEl.style.display = 'block'; return; }
+  if (isNaN(laborMixVal) || laborMixVal < 0 || laborMixVal > 100) { errEl.textContent = 'Please enter a valid labor mix between 0 and 100.'; errEl.style.display = 'block'; return; }
+  if (isNaN(billableRateVal) || billableRateVal <= 0) { errEl.textContent = 'Please enter a valid billable rate greater than zero.'; errEl.style.display = 'block'; return; }
+  const startMonthChanged = startMonthVal \!== setupConfig.startMonth;
+  setupConfig.startMonth = startMonthVal;
+  setupConfig.laborMix = laborMixVal / 100;
   setupConfig.billableRate = billableRateVal;
-
   const { keys, labels } = generateMonths(startMonthVal);
-  setupConfig.monthKeys   = keys;
-  setupConfig.monthLabels = labels;
-
-  // If start month changed, prune dropped month columns from every row
+  setupConfig.monthKeys = keys; setupConfig.monthLabels = labels;
   if (startMonthChanged && Object.keys(rowStore).length > 0) {
     const newKeySet = new Set(keys);
     Object.values(rowStore).forEach(row => {
-      if (!row.months) return;
-      Object.keys(row.months).forEach(mk => {
-        if (!newKeySet.has(mk)) delete row.months[mk];
-      });
+      if (\!row.months) return;
+      Object.keys(row.months).forEach(mk => { if (\!newKeySet.has(mk)) delete row.months[mk]; });
     });
   }
-
   closeSetupModal();
-
-  const hasRows = Object.keys(rowStore).length > 0;
-  if (hasRows) {
-    renderResults();
-    scheduleSave();
-  } else {
-    show('uploadZone');
-  }
+  if (Object.keys(rowStore).length > 0) { renderResults(); scheduleSave(); } else { show('uploadZone'); }
 }
 
-// ─── Danger zone (reset all) ──────────────────────────────
-function showResetConfirm() {
-  document.getElementById('resetTriggerBtn').style.display   = 'none';
-  document.getElementById('resetConfirmPanel').style.display = 'block';
-}
-
-function cancelReset() {
-  document.getElementById('resetTriggerBtn').style.display   = 'block';
-  document.getElementById('resetConfirmPanel').style.display = 'none';
-}
-
+// ── Danger zone ───────────────────────────────────────────
+function showResetConfirm() { document.getElementById('resetTriggerBtn').style.display = 'none'; document.getElementById('resetConfirmPanel').style.display = 'block'; }
+function cancelReset() { document.getElementById('resetTriggerBtn').style.display = 'block'; document.getElementById('resetConfirmPanel').style.display = 'none'; }
 function confirmResetAll() {
-  // Delete from Firestore
   const user = auth.currentUser;
-  if (user) {
-    db.collection('users').doc(user.uid)
-      .collection('data').doc('appState').delete()
-      .catch(e => console.warn('Could not delete Firestore document:', e));
-  }
+  if (user) db.collection('users').doc(user.uid).collection('data').doc('appState').delete().catch(e => console.warn(e));
   rowStore = {};
-  setupConfig.startMonth   = null;
-  setupConfig.laborMix     = 0.28;
-  setupConfig.billableRate = 150;
-  setupConfig.monthKeys    = [];
-  setupConfig.monthLabels  = [];
-  pendingDeleteKey = null;
-  uploadingFromResults = false;
-
+  Object.assign(setupConfig, { startMonth: null, laborMix: 0.28, billableRate: 150, monthKeys: [], monthLabels: [], columnVisibility: {} });
+  pendingDeleteKey = null; uploadingFromResults = false;
   closeSetupModal();
-  hide('results');
-  hide('uploadZone');
-  hide('processing');
+  hide('results'); hide('uploadZone'); hide('processing');
   document.getElementById('uploadCancel').style.display = 'none';
-  document.getElementById('rowPicker').style.display    = 'none';
+  document.getElementById('rowPicker').style.display = 'none';
   document.getElementById('tableHead').innerHTML = '';
   document.getElementById('tableBody').innerHTML = '';
   document.getElementById('pipelineTotal').textContent = '—';
@@ -1316,448 +606,249 @@ function confirmResetAll() {
   openSetupModal();
 }
 
-// ─── Month helpers ────────────────────────────────────────
-function generateMonths(startMonthStr) {
-  const [y0, m0] = startMonthStr.split('-').map(Number);
+// ── Month helpers ─────────────────────────────────────────
+function generateMonths(s) {
+  const [y0, m0] = s.split('-').map(Number);
   const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const keys = [], labels = [];
   for (let i = 0; i < 12; i++) {
-    const total = (m0 - 1) + i;
-    const y = y0 + Math.floor(total / 12);
-    const m = total % 12;
-    keys.push(`${y}-${String(m + 1).padStart(2, '0')}`);
+    const t = (m0 - 1) + i, y = y0 + Math.floor(t / 12), m = t % 12;
+    keys.push(`${y}-${String(m+1).padStart(2,'0')}`);
     labels.push(`${names[m]} ${y}`);
   }
   return { keys, labels };
 }
+function currentMonthStr() { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; }
+function makeRowKey(name, num) { return `${String(name||'').trim()}___${String(num||'').trim()}`; }
 
-function currentMonthStr() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-}
-
-// ─── Row key ──────────────────────────────────────────────
-function makeRowKey(name, num) {
-  return `${String(name || '').trim()}___${String(num || '').trim()}`;
-}
-
-// ─── Upload wiring ────────────────────────────────────────
+// ── Upload wiring ─────────────────────────────────────────
 const uploadZone = document.getElementById('uploadZone');
 const fileInput  = document.getElementById('fileInput');
-
 uploadZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
-uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-});
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
 
-// ─── Upload File (from results) ───────────────────────────
-function triggerUploadFile() {
-  uploadingFromResults = true;
-  hide('results');
-  showError('');
-  show('uploadZone');
-  document.getElementById('uploadCancel').style.display = 'block';
-}
-
+function triggerUploadFile() { uploadingFromResults = true; hide('results'); showError(''); show('uploadZone'); document.getElementById('uploadCancel').style.display = 'block'; }
 function cancelUpload() {
-  hide('uploadZone');
-  hide('processing');
+  hide('uploadZone'); hide('processing');
   document.getElementById('uploadCancel').style.display = 'none';
-  document.getElementById('rowPicker').style.display    = 'none';
+  document.getElementById('rowPicker').style.display = 'none';
   document.getElementById('filterModalOverlay').classList.remove('show');
-  showError('');
-  pendingAllRows    = null;
-  pendingHeaderIdx  = null;
-  hasHiddenRows     = false;
-  fileInput.value   = '';
-
-  if (uploadingFromResults && Object.keys(rowStore).length > 0) {
-    uploadingFromResults = false;
-    show('results');
-  } else {
-    uploadingFromResults = false;
-  }
+  showError(''); pendingAllRows = null; pendingHeaderIdx = null; hasHiddenRows = false; fileInput.value = '';
+  if (uploadingFromResults && Object.keys(rowStore).length > 0) { uploadingFromResults = false; show('results'); } else { uploadingFromResults = false; }
 }
 
-// ─── File handler ─────────────────────────────────────────
+// ── File handler ──────────────────────────────────────────
 function handleFile(file) {
-  showError('');
-  hide('uploadZone');
-  document.getElementById('uploadCancel').style.display = 'none';
-  show('processing');
-  hide('results');
-  hide('rowPicker');
-
+  showError(''); hide('uploadZone'); document.getElementById('uploadCancel').style.display = 'none';
+  show('processing'); hide('results'); hide('rowPicker');
   const reader = new FileReader();
   reader.onload = e => {
     try {
       const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
       const sheetName = detectSheet(wb);
       const ws = wb.Sheets[sheetName];
-      const rowMeta    = ws['!rows'] || [];
-      hasHiddenRows    = rowMeta.some(r => r && r.hidden === true);
-      const allRows    = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: false, dateNF: 'yyyy-mm-dd' });
-      const visibleRows = allRows.filter((_, i) => !(rowMeta[i] && rowMeta[i].hidden === true));
-      hide('processing');
-      processRawRows(visibleRows, hasHiddenRows);
+      const rowMeta = ws['\!rows'] || [];
+      hasHiddenRows = rowMeta.some(r => r && r.hidden === true);
+      const allRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: false, dateNF: 'yyyy-mm-dd' });
+      const visibleRows = allRows.filter((_, i) => \!(rowMeta[i] && rowMeta[i].hidden === true));
+      hide('processing'); processRawRows(visibleRows, hasHiddenRows);
     } catch(err) {
       showError('Could not read the file. Make sure it is a valid .xlsx, .xls, or .csv file.\n' + err.message);
-      hide('processing');
-      // Return to upload zone
-      show('uploadZone');
+      hide('processing'); show('uploadZone');
       if (uploadingFromResults) document.getElementById('uploadCancel').style.display = 'block';
     }
   };
   reader.readAsArrayBuffer(file);
 }
 
-// ─── Sheet detection ──────────────────────────────────────
 function detectSheet(wb) {
   for (const sn of wb.SheetNames) {
     const ws = wb.Sheets[sn];
-    const tables = ws['!tables'];
+    const tables = ws['\!tables'];
     if (tables && tables.some(t => t.name === 'EstimatesandProgressInvoicing')) return sn;
   }
-  return wb.SheetNames.find(n =>
-    n.replace(/\s/g,'').toLowerCase().includes('estimate') ||
-    n.replace(/\s/g,'').toLowerCase().includes('invoic')
-  ) || wb.SheetNames[0];
+  return wb.SheetNames.find(n => n.replace(/\s/g,'').toLowerCase().includes('estimate') || n.replace(/\s/g,'').toLowerCase().includes('invoic')) || wb.SheetNames[0];
 }
 
-// ─── Row processing ───────────────────────────────────────
 function processRawRows(allRows, filtersDetected) {
   pendingAllRows = allRows;
   const headerIdx = findHeaderRow(allRows);
-  if (headerIdx !== -1) {
-    if (filtersDetected) {
-      pendingHeaderIdx = headerIdx;
-      document.getElementById('filterModalOverlay').classList.add('show');
-    } else {
-      buildPipelineFromRows(allRows, headerIdx);
-    }
+  if (headerIdx \!== -1) {
+    if (filtersDetected) { pendingHeaderIdx = headerIdx; document.getElementById('filterModalOverlay').classList.add('show'); }
+    else { buildPipelineFromRows(allRows, headerIdx); }
   } else {
     if (filtersDetected) hasHiddenRows = true;
     showRowPicker(allRows);
   }
 }
 
-// ─── Header detection ────────────────────────────────────
 function findHeaderRow(allRows) {
   for (let i = 0; i < allRows.length; i++) {
-    const row = allRows[i].map(c => String(c || '').trim().toLowerCase());
-    const hasStatus    = row.some(c => c === 'status');
-    const hasRemaining = row.some(c => c.replace(/\s+/g, ' ') === 'remaining amount');
-    if (hasStatus && hasRemaining) return i;
+    const row = allRows[i].map(c => String(c||'').trim().toLowerCase());
+    if (row.some(c => c === 'status') && row.some(c => c.replace(/\s+/g,' ') === 'remaining amount')) return i;
   }
   return -1;
 }
 
-// ─── Filter warning ───────────────────────────────────────
 function acknowledgeFilterWarning() {
   document.getElementById('filterModalOverlay').classList.remove('show');
   buildPipelineFromRows(pendingAllRows, pendingHeaderIdx);
   pendingHeaderIdx = null;
 }
 
-// ─── Row picker ───────────────────────────────────────────
 function showRowPicker(allRows) {
-  hide('uploadZone');
-  document.getElementById('uploadCancel').style.display = 'none';
+  hide('uploadZone'); document.getElementById('uploadCancel').style.display = 'none';
   const list = document.getElementById('rowPickerList');
-  list.innerHTML = '';
-  selectedHeaderIdx = null;
-
-  const candidates = allRows
-    .map((row, i) => ({ row, i }))
-    .filter(({ row }) => row.some(c => c !== null && c !== ''))
-    .slice(0, 20);
-
-  candidates.forEach(({ row, i }) => {
-    const item  = document.createElement('div');
-    item.className  = 'row-picker-item';
-    item.dataset.idx = i;
-
-    const radio = document.createElement('input');
-    radio.type = 'radio'; radio.name = 'headerRow'; radio.value = i;
-    radio.addEventListener('change', () => {
-      document.querySelectorAll('.row-picker-item').forEach(el => el.classList.remove('selected'));
-      item.classList.add('selected');
-      selectedHeaderIdx = i;
-    });
-
-    const rownum = document.createElement('span');
-    rownum.className = 'row-picker-rownum';
-    rownum.textContent = 'Row ' + (i + 1);
-
-    const preview = document.createElement('span');
-    preview.className = 'row-picker-preview';
-    preview.textContent = row.filter(c => c !== null && c !== '').slice(0, 8).join('  ·  ');
-
+  list.innerHTML = ''; selectedHeaderIdx = null;
+  const candidates = allRows.map((row, i) => ({row, i})).filter(({row}) => row.some(c => c \!== null && c \!== '')).slice(0, 20);
+  candidates.forEach(({row, i}) => {
+    const item = document.createElement('div'); item.className = 'row-picker-item'; item.dataset.idx = i;
+    const radio = document.createElement('input'); radio.type = 'radio'; radio.name = 'headerRow'; radio.value = i;
+    radio.addEventListener('change', () => { document.querySelectorAll('.row-picker-item').forEach(el => el.classList.remove('selected')); item.classList.add('selected'); selectedHeaderIdx = i; });
+    const rownum = document.createElement('span'); rownum.className = 'row-picker-rownum'; rownum.textContent = 'Row ' + (i+1);
+    const preview = document.createElement('span'); preview.className = 'row-picker-preview'; preview.textContent = row.filter(c => c \!== null && c \!== '').slice(0, 8).join('  ·  ');
     item.appendChild(radio); item.appendChild(rownum); item.appendChild(preview);
     item.addEventListener('click', () => { radio.checked = true; radio.dispatchEvent(new Event('change')); });
     list.appendChild(item);
   });
-
   document.getElementById('rowPicker').style.display = 'block';
 }
 
 function confirmHeaderRow() {
   if (selectedHeaderIdx === null) { showError('Please select a header row before continuing.'); return; }
-  showError('');
-  document.getElementById('rowPicker').style.display = 'none';
-  if (hasHiddenRows) {
-    pendingHeaderIdx = selectedHeaderIdx;
-    document.getElementById('filterModalOverlay').classList.add('show');
-  } else {
-    show('processing');
-    buildPipelineFromRows(pendingAllRows, selectedHeaderIdx);
-  }
+  showError(''); document.getElementById('rowPicker').style.display = 'none';
+  if (hasHiddenRows) { pendingHeaderIdx = selectedHeaderIdx; document.getElementById('filterModalOverlay').classList.add('show'); }
+  else { show('processing'); buildPipelineFromRows(pendingAllRows, selectedHeaderIdx); }
 }
+function cancelRowPicker() { document.getElementById('rowPicker').style.display = 'none'; cancelUpload(); }
 
-function cancelRowPicker() {
-  document.getElementById('rowPicker').style.display = 'none';
-  cancelUpload();
-}
-
-// ─── Pipeline + merge ─────────────────────────────────────
+// ── Pipeline build + merge ────────────────────────────────
 function buildPipelineFromRows(allRows, headerIdx) {
   const headerRow = allRows[headerIdx];
-
-  const colMap = headerRow.map((h, i) => {
-    if (i === 0) return 'Name';
-    return (h !== null && h !== undefined && String(h).trim() !== '')
-      ? String(h).trim() : `__col${i}`;
-  });
-
+  const colMap = headerRow.map((h, i) => i === 0 ? 'Name' : (h \!== null && h \!== undefined && String(h).trim() \!== '') ? String(h).trim() : `__col${i}`);
   let rawRows = allRows.slice(headerIdx + 1)
-    .filter(rowArr => rowArr.some(c => c !== null && c !== ''))
-    .map(rowArr => {
-      const obj = {};
-      colMap.forEach((col, i) => { obj[col] = rowArr[i] !== undefined ? rowArr[i] : null; });
-      return obj;
-    });
-
-  if (!rawRows || rawRows.length === 0) {
+    .filter(rowArr => rowArr.some(c => c \!== null && c \!== ''))
+    .map(rowArr => { const obj = {}; colMap.forEach((col, i) => { obj[col] = rowArr[i] \!== undefined ? rowArr[i] : null; }); return obj; });
+  if (\!rawRows || rawRows.length === 0) {
     showError('No data rows found after the header row. Please check the file.');
-    hide('processing');
-    show('uploadZone');
+    hide('processing'); show('uploadZone');
     if (uploadingFromResults) document.getElementById('uploadCancel').style.display = 'block';
     return;
   }
-
-  // Fill down Name
   let lastName = null;
-  rawRows = rawRows.map(row => {
-    const r = { ...row };
-    const v = r['Name'];
-    if (v !== null && v !== undefined && String(v).trim() !== '') lastName = String(v).trim();
-    r['Name'] = lastName || '';
-    return r;
-  });
-
-  // Null replacements
-  rawRows = rawRows.map(row => ({
-    ...row,
-    'Num':    (row['Num']    == null) ? '' : row['Num'],
-    'Status': (row['Status'] == null) ? '' : row['Status'],
-  }));
-
-  // Filter: Status = "Accepted"
+  rawRows = rawRows.map(row => { const r = {...row}; const v = r['Name']; if (v \!== null && v \!== undefined && String(v).trim() \!== '') lastName = String(v).trim(); r['Name'] = lastName || ''; return r; });
+  rawRows = rawRows.map(row => ({ ...row, 'Num': (row['Num'] == null) ? '' : row['Num'], 'Status': (row['Status'] == null) ? '' : row['Status'] }));
   rawRows = rawRows.filter(row => row['Status'] === 'Accepted');
-
-  // Filter: exclude RFP rows (skip cols 0 and 1)
   const RFP = [/rfp/i, /request\s+for\s+pay/i, /req\.?\s+for\s+pay/i, /r\.f\.p/i];
-  const colsToSearch = colMap.slice(1);
-  rawRows = rawRows.filter(row =>
-    !colsToSearch.some(col => RFP.some(p => p.test(String(row[col] || '').trim())))
-  );
-
-  // Parse numeric fields
-  rawRows = rawRows.map(row => ({
-    ...row,
-    'Amount':          parseCurrency(row['Amount']),
-    'Invoiced Amount': parseCurrency(row['Invoiced Amount']),
-    'Remaining Amount':parseCurrency(row['Remaining Amount']),
-  }));
-
-  // Merge into rowStore
+  const colsToSearch = colMap.slice(2);
+  rawRows = rawRows.filter(row => \!colsToSearch.some(col => RFP.some(p => p.test(String(row[col]||'').trim()))));
+  rawRows = rawRows.map(row => ({ ...row, 'Amount': parseCurrency(row['Amount']), 'Invoiced Amount': parseCurrency(row['Invoiced Amount']), 'Remaining Amount': parseCurrency(row['Remaining Amount']) }));
   mergeRows(rawRows);
-
-  uploadingFromResults = false;
-  fileInput.value = '';
-  renderResults();
-  scheduleSave();
+  uploadingFromResults = false; fileInput.value = '';
+  renderResults(); scheduleSave();
 }
 
-// ─── Merge logic ──────────────────────────────────────────
 function mergeRows(newRows) {
   const newStore = {};
-
   newRows.forEach(row => {
-    const key      = makeRowKey(row['Name'], row['Num']);
+    const key = makeRowKey(row['Name'], row['Num']);
     const existing = rowStore[key];
-
     if (existing) {
-      // UPDATE core fields; preserve months
-      newStore[key] = {
-        ...existing,
-        name:            row['Name']           || existing.name,
-        num:             String(row['Num']     || existing.num),
-        date:            row['Date']           || existing.date || '',
-        amount:          row['Amount'],
-        invoicedAmount:  row['Invoiced Amount'],
-        remainingAmount: row['Remaining Amount'],
-        // months preserved as-is
-      };
+      newStore[key] = { ...existing, name: row['Name']||existing.name, num: String(row['Num']||existing.num), date: row['Date']||existing.date||'', amount: row['Amount'], invoicedAmount: row['Invoiced Amount'], remainingAmount: row['Remaining Amount'] };
     } else {
-      // ADD new row
-      newStore[key] = {
-        name:            row['Name'] || '',
-        num:             String(row['Num'] || ''),
-        date:            row['Date'] || '',
-        amount:          row['Amount'],
-        invoicedAmount:  row['Invoiced Amount'],
-        remainingAmount: row['Remaining Amount'],
-        months:          {},
-      };
+      newStore[key] = { name: row['Name']||'', num: String(row['Num']||''), date: row['Date']||'', amount: row['Amount'], invoicedAmount: row['Invoiced Amount'], remainingAmount: row['Remaining Amount'], months: {} };
     }
-    // Rows in rowStore but NOT in newRows are omitted → deleted
   });
-
   rowStore = newStore;
 }
-
-// ─── Render ───────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────
 function renderResults() {
   const rows = Object.entries(rowStore);
-
-  // Pipeline total
-  const total = rows.reduce((s, [, r]) => s + (r.remainingAmount || 0), 0);
+  const total = rows.reduce((s, [,r]) => s + (r.remainingAmount||0), 0);
   document.getElementById('pipelineTotal').textContent = fmtCurrency(total);
 
-  const coreCols = ['Name', 'Num', 'Date', 'Amount', 'Invoiced Amount', 'Remaining Amount', 'Hours Remaining'];
+  const coreCols = ['Name','Num','Date','Amount','Invoiced Amount','Remaining Amount','Hours Remaining'];
 
-  // ── thead ──────────────────────────────────────────────
+  // thead — column headers
   let headHtml = '<tr>';
   headHtml += '<th class="del-th"></th>';
-  coreCols.forEach(c => { headHtml += `<th>${c}</th>`; });
+  coreCols.forEach(c => { if (\!isColVisible(c)) return; headHtml += `<th>${c}</th>`; });
   setupConfig.monthLabels.forEach(lbl => { headHtml += `<th class="month-th">${lbl}</th>`; });
   headHtml += '</tr>';
 
-  // Total hours row
-  headHtml += '<tr id="totalHoursRow">';
-  headHtml += '<td class="del-spacer"></td>';
-  headHtml += '<td class="total-row-label">Total hours</td>';
-  coreCols.slice(1).forEach(col => {
-    if (col === 'Hours Remaining') {
-      headHtml += '<td class="total-hours-cell" id="totalHoursRemaining">—</td>';
-    } else {
-      headHtml += '<td></td>';
-    }
+  // thead — total hours row
+  headHtml += '<tr id="totalHoursRow"><td class="del-spacer"></td>';
+  let firstTotalCell = true;
+  coreCols.forEach(col => {
+    if (\!isColVisible(col)) return;
+    if (firstTotalCell) { headHtml += '<td class="total-row-label">Total hours</td>'; firstTotalCell = false; }
+    else if (col === 'Hours Remaining') { headHtml += '<td class="total-hours-cell" id="totalHoursRemaining">—</td>'; }
+    else { headHtml += '<td></td>'; }
   });
-  setupConfig.monthKeys.forEach(key => {
-    headHtml += `<td class="total-hours-cell" id="totalHours_${key}">—</td>`;
-  });
+  setupConfig.monthKeys.forEach(key => { headHtml += `<td class="total-hours-cell" id="totalHours_${key}">—</td>`; });
   headHtml += '</tr>';
-
   document.getElementById('tableHead').innerHTML = headHtml;
 
-  // ── tbody ──────────────────────────────────────────────
+  // tbody
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
+  const visibleCoreCount = coreCols.filter(c => isColVisible(c)).length;
 
   if (rows.length === 0) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
-    td.colSpan = 1 + coreCols.length + setupConfig.monthKeys.length;
+    td.colSpan = 1 + visibleCoreCount + setupConfig.monthKeys.length;
     td.innerHTML = '<div class="empty-state">No rows to display. Use <strong>Upload File</strong> to add data.</div>';
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+    tr.appendChild(td); tbody.appendChild(tr);
   } else {
     rows.forEach(([rowKey, row]) => {
       const tr = document.createElement('tr');
 
-      // Delete button cell
-      const delTd = document.createElement('td');
-      delTd.className = 'del-td';
-      const delBtn = document.createElement('button');
-      delBtn.className = 'delete-btn';
-      delBtn.title = 'Delete row';
-      delBtn.textContent = '✕';
+      // Delete button
+      const delTd = document.createElement('td'); delTd.className = 'del-td';
+      const delBtn = document.createElement('button'); delBtn.className = 'delete-btn'; delBtn.title = 'Delete row'; delBtn.textContent = '✕';
       delBtn.addEventListener('click', e => { e.stopPropagation(); deleteRow(rowKey); });
-      delTd.appendChild(delBtn);
-      tr.appendChild(delTd);
+      delTd.appendChild(delBtn); tr.appendChild(delTd);
 
       // Core columns
       coreCols.forEach(col => {
-        const td  = document.createElement('td');
+        if (\!isColVisible(col)) return;
+        const td = document.createElement('td');
         let val;
         switch(col) {
-          case 'Name':            val = row.name;            break;
-          case 'Num':             val = row.num;             break;
-          case 'Date':            val = row.date;            break;
-          case 'Amount':          val = row.amount;          break;
-          case 'Invoiced Amount': val = row.invoicedAmount;  break;
-          case 'Remaining Amount':val = row.remainingAmount; break;
-          case 'Hours Remaining': val = calcHoursRemaining(row.remainingAmount); break;
-          default:                val = '';
+          case 'Name':             val = row.name; break;
+          case 'Num':              val = row.num; break;
+          case 'Date':             val = row.date; break;
+          case 'Amount':           val = row.amount; break;
+          case 'Invoiced Amount':  val = row.invoicedAmount; break;
+          case 'Remaining Amount': val = row.remainingAmount; break;
+          case 'Hours Remaining':  val = calcHoursRemaining(row.remainingAmount); break;
+          default:                 val = '';
         }
-        if (['Amount','Invoiced Amount','Remaining Amount'].includes(col)) {
-          td.className = 'currency';
-          td.textContent = fmtCurrency(val || 0);
-        } else if (col === 'Hours Remaining') {
-          td.className = 'num';
-          td.textContent = fmtHours(val || 0);
-        } else {
-          td.textContent = (val !== null && val !== undefined) ? val : '';
-        }
+        if (['Amount','Invoiced Amount','Remaining Amount'].includes(col)) { td.className = 'currency'; td.textContent = fmtCurrency(val||0); }
+        else if (col === 'Hours Remaining') { td.className = 'num'; td.textContent = fmtHours(val||0); }
+        else { td.textContent = (val \!== null && val \!== undefined) ? val : ''; }
         tr.appendChild(td);
       });
 
       // Month columns
       setupConfig.monthKeys.forEach(monthKey => {
-        const td = document.createElement('td');
-        td.className = 'month-cell';
-
+        const td = document.createElement('td'); td.className = 'month-cell';
         const cellData = row.months && row.months[monthKey];
         const savedPct = cellData ? cellData.pct : null;
-
-        // % input
-        const pctWrap = document.createElement('div');
-        pctWrap.className = 'pct-wrap';
-
-        const input = document.createElement('input');
-        input.type = 'number'; input.className = 'pct-input';
-        input.min = '0'; input.step = '0.1'; input.placeholder = '0';
-        if (savedPct !== null && savedPct !== 0) input.value = savedPct;
-
-        const suffix = document.createElement('span');
-        suffix.className = 'pct-suffix'; suffix.textContent = '%';
-
+        const pctWrap = document.createElement('div'); pctWrap.className = 'pct-wrap';
+        const input = document.createElement('input'); input.type = 'number'; input.className = 'pct-input'; input.min = '0'; input.step = '0.1'; input.placeholder = '0';
+        if (savedPct \!== null && savedPct \!== 0) input.value = savedPct;
+        const suffix = document.createElement('span'); suffix.className = 'pct-suffix'; suffix.textContent = '%';
         pctWrap.appendChild(input); pctWrap.appendChild(suffix);
-
-        // Hours display
-        const hoursDiv = document.createElement('div');
-        hoursDiv.id = `hours_${rowKey}_${monthKey}`;
-
-        if (cellData && cellData.pct) {
-          const hrs = calcCellHours(row.remainingAmount, cellData);
-          hoursDiv.className   = 'cell-hours has-value';
-          hoursDiv.textContent = fmtHours(hrs);
-        } else {
-          hoursDiv.className   = 'cell-hours';
-          hoursDiv.textContent = '—';
-        }
-
+        const hoursDiv = document.createElement('div'); hoursDiv.id = `hours_${rowKey}_${monthKey}`;
+        if (cellData && cellData.pct) { hoursDiv.className = 'cell-hours has-value'; hoursDiv.textContent = fmtHours(calcCellHours(row.remainingAmount, cellData)); }
+        else { hoursDiv.className = 'cell-hours'; hoursDiv.textContent = '—'; }
         input.addEventListener('input', () => handlePctInput(rowKey, monthKey, input, hoursDiv));
-
-        td.appendChild(pctWrap); td.appendChild(hoursDiv);
-        tr.appendChild(td);
+        td.appendChild(pctWrap); td.appendChild(hoursDiv); tr.appendChild(td);
       });
 
       tbody.appendChild(tr);
@@ -1765,210 +856,138 @@ function renderResults() {
   }
 
   updateAllTotals();
-
   const count = rows.length;
-  document.getElementById('rowBadge').textContent = count + ' row' + (count !== 1 ? 's' : '');
-
-  hide('processing');
-  hide('uploadZone');
-  document.getElementById('uploadCancel').style.display = 'none';
-  show('results');
+  document.getElementById('rowBadge').textContent = count + ' row' + (count \!== 1 ? 's' : '');
+  hide('processing'); hide('uploadZone'); document.getElementById('uploadCancel').style.display = 'none'; show('results');
 }
 
-// ─── Per-cell % handler ───────────────────────────────────
+// ── Per-cell % handler ────────────────────────────────────
 function handlePctInput(rowKey, monthKey, input, hoursDiv) {
   const raw = input.value.trim();
-  const val = raw === '' ? null : (parseFloat(raw) || 0);
-
+  const val = raw === '' ? null : (parseFloat(raw)||0);
   const row = rowStore[rowKey];
-  if (!row) return;
-  if (!row.months) row.months = {};
-
+  if (\!row) return;
+  if (\!row.months) row.months = {};
   if (val === null || val === 0) {
-    delete row.months[monthKey];
-    hoursDiv.textContent = '—';
-    hoursDiv.className   = 'cell-hours';
+    delete row.months[monthKey]; hoursDiv.textContent = '—'; hoursDiv.className = 'cell-hours';
   } else {
-    row.months[monthKey] = {
-      pct:          val,
-      laborMix:     setupConfig.laborMix,
-      billableRate: setupConfig.billableRate,
-    };
-    const hrs = calcCellHours(row.remainingAmount, row.months[monthKey]);
-    hoursDiv.textContent = fmtHours(hrs);
-    hoursDiv.className   = 'cell-hours has-value';
+    row.months[monthKey] = { pct: val, laborMix: setupConfig.laborMix, billableRate: setupConfig.billableRate };
+    hoursDiv.textContent = fmtHours(calcCellHours(row.remainingAmount, row.months[monthKey]));
+    hoursDiv.className = 'cell-hours has-value';
   }
-
-  updateMonthTotal(monthKey);
-  scheduleSave();
-
-  // Validation
-  if (val !== null && val > 100) {
-    showPctWarning(`A single entry exceeds 100% — you entered ${val.toFixed(1)}%.`);
-    return;
-  }
-
-  if (val !== null) {
-    const rowTotal = setupConfig.monthKeys.reduce((sum, key) => {
-      const d = row.months && row.months[key];
-      return sum + (d ? d.pct : 0);
-    }, 0);
-    if (rowTotal > 100) {
-      showPctWarning(
-        `The total percentage across all months for this row is ${rowTotal.toFixed(1)}%, which exceeds 100%.`
-      );
-    }
+  updateMonthTotal(monthKey); scheduleSave();
+  if (val \!== null && val > 100) { showPctWarning(`A single entry exceeds 100% — you entered ${val.toFixed(1)}%.`); return; }
+  if (val \!== null) {
+    const rowTotal = setupConfig.monthKeys.reduce((sum, key) => { const d = row.months && row.months[key]; return sum + (d ? d.pct : 0); }, 0);
+    if (rowTotal > 100) showPctWarning(`The total percentage across all months for this row is ${rowTotal.toFixed(1)}%, which exceeds 100%.`);
   }
 }
 
-// ─── Hours calculation ────────────────────────────────────
+// ── Hours calculations ────────────────────────────────────
 function calcCellHours(remainingAmount, cellData) {
-  if (!cellData || !cellData.pct || !cellData.billableRate) return 0;
-  return (remainingAmount * (cellData.pct / 100) * cellData.laborMix) / cellData.billableRate;
+  if (\!cellData || \!cellData.pct || \!cellData.billableRate) return 0;
+  return (remainingAmount * (cellData.pct/100) * cellData.laborMix) / cellData.billableRate;
 }
-
 function calcHoursRemaining(remainingAmount) {
-  if (!setupConfig.billableRate) return 0;
+  if (\!setupConfig.billableRate) return 0;
   return (remainingAmount * setupConfig.laborMix) / setupConfig.billableRate;
 }
 
-// ─── Totals ───────────────────────────────────────────────
+// ── Totals ────────────────────────────────────────────────
 function updateMonthTotal(monthKey) {
-  const total = Object.values(rowStore).reduce((sum, row) => {
-    const d = row.months && row.months[monthKey];
-    return sum + (d ? calcCellHours(row.remainingAmount, d) : 0);
-  }, 0);
+  const total = Object.values(rowStore).reduce((sum, row) => { const d = row.months && row.months[monthKey]; return sum + (d ? calcCellHours(row.remainingAmount, d) : 0); }, 0);
   const el = document.getElementById(`totalHours_${monthKey}`);
   if (el) el.textContent = total > 0 ? fmtHours(total) : '—';
 }
-
 function updateHoursRemainingTotal() {
-  const total = Object.values(rowStore).reduce((sum, row) => {
-    return sum + calcHoursRemaining(row.remainingAmount || 0);
-  }, 0);
+  const total = Object.values(rowStore).reduce((sum, row) => sum + calcHoursRemaining(row.remainingAmount||0), 0);
   const el = document.getElementById('totalHoursRemaining');
   if (el) el.textContent = total > 0 ? fmtHours(total) : '—';
 }
+function updateAllTotals() { updateHoursRemainingTotal(); setupConfig.monthKeys.forEach(k => updateMonthTotal(k)); }
 
-function updateAllTotals() {
-  updateHoursRemainingTotal();
-  setupConfig.monthKeys.forEach(k => updateMonthTotal(k));
-}
-
-// ─── Row deletion ─────────────────────────────────────────
+// ── Row deletion ──────────────────────────────────────────
 function deleteRow(rowKey) {
-  const row = rowStore[rowKey];
-  if (!row) return;
+  const row = rowStore[rowKey]; if (\!row) return;
   pendingDeleteKey = rowKey;
   const label = [row.name, row.num].filter(Boolean).join(' · ');
-  document.getElementById('deleteModalBody').textContent =
-    `Delete "${label}"? It will be restored if you upload a file containing it.`;
+  document.getElementById('deleteModalBody').textContent = `Delete "${label}"? It will be restored if you upload a file containing it.`;
   document.getElementById('deleteModalOverlay').classList.add('show');
 }
+function confirmDeleteRow() { if (\!pendingDeleteKey) return; delete rowStore[pendingDeleteKey]; pendingDeleteKey = null; document.getElementById('deleteModalOverlay').classList.remove('show'); renderResults(); scheduleSave(); }
+function closeDeleteModal() { pendingDeleteKey = null; document.getElementById('deleteModalOverlay').classList.remove('show'); }
 
-function confirmDeleteRow() {
-  if (!pendingDeleteKey) return;
-  delete rowStore[pendingDeleteKey];
-  pendingDeleteKey = null;
-  document.getElementById('deleteModalOverlay').classList.remove('show');
-  renderResults();
-  scheduleSave();
-}
+// ── % warning ─────────────────────────────────────────────
+function showPctWarning(msg) { document.getElementById('pctWarningBody').textContent = msg; document.getElementById('pctWarningOverlay').classList.add('show'); }
+function closePctWarning() { document.getElementById('pctWarningOverlay').classList.remove('show'); }
 
-function closeDeleteModal() {
-  pendingDeleteKey = null;
-  document.getElementById('deleteModalOverlay').classList.remove('show');
-}
-
-// ─── Percentage warning ───────────────────────────────────
-function showPctWarning(msg) {
-  document.getElementById('pctWarningBody').textContent = msg;
-  document.getElementById('pctWarningOverlay').classList.add('show');
-}
-
-function closePctWarning() {
-  document.getElementById('pctWarningOverlay').classList.remove('show');
-}
-
-// ─── Export CSV ───────────────────────────────────────────
+// ── Export CSV ────────────────────────────────────────────
 function exportCSV() {
-  const coreCols = ['Name', 'Num', 'Date', 'Amount', 'Invoiced Amount', 'Remaining Amount', 'Hours Remaining'];
+  const coreCols = ['Name','Num','Date','Amount','Invoiced Amount','Remaining Amount','Hours Remaining'];
   const monthHeaders = setupConfig.monthLabels.flatMap(lbl => [`${lbl} %`, `${lbl} hrs`]);
-  const allHeaders   = [...coreCols, ...monthHeaders];
-  const lines = [csvRow(allHeaders)];
-
-  // Total hours row
-  const hrTotal = Object.values(rowStore).reduce((sum, row) =>
-    sum + calcHoursRemaining(row.remainingAmount || 0), 0);
+  const lines = [csvRow([...coreCols, ...monthHeaders])];
+  const hrTotal = Object.values(rowStore).reduce((sum, row) => sum + calcHoursRemaining(row.remainingAmount||0), 0);
   const totalVals = setupConfig.monthKeys.flatMap(key => {
-    const t = Object.values(rowStore).reduce((sum, row) => {
-      const d = row.months && row.months[key];
-      return sum + (d ? calcCellHours(row.remainingAmount, d) : 0);
-    }, 0);
+    const t = Object.values(rowStore).reduce((sum, row) => { const d = row.months && row.months[key]; return sum + (d ? calcCellHours(row.remainingAmount, d) : 0); }, 0);
     return ['', t.toFixed(2)];
   });
-  const totalRowCore = coreCols.map((col, i) => {
-    if (i === 0) return 'Total hours';
-    if (col === 'Hours Remaining') return hrTotal.toFixed(2);
-    return '';
-  });
+  const totalRowCore = coreCols.map((col, i) => { if (i === 0) return 'Total hours'; if (col === 'Hours Remaining') return hrTotal.toFixed(2); return ''; });
   lines.push(csvRow([...totalRowCore, ...totalVals]));
-
-  // Data rows
   Object.values(rowStore).forEach(row => {
-    const coreVals = [
-      row.name, row.num, row.date,
-      (row.amount          || 0).toFixed(2),
-      (row.invoicedAmount  || 0).toFixed(2),
-      (row.remainingAmount || 0).toFixed(2),
-      calcHoursRemaining(row.remainingAmount || 0).toFixed(2),
-    ];
-    const monthVals = setupConfig.monthKeys.flatMap(key => {
-      const d = row.months && row.months[key];
-      const pct = d ? d.pct : 0;
-      const hrs = d ? calcCellHours(row.remainingAmount, d) : 0;
-      return [pct || '', hrs.toFixed(2)];
-    });
+    const coreVals = [row.name, row.num, row.date, (row.amount||0).toFixed(2), (row.invoicedAmount||0).toFixed(2), (row.remainingAmount||0).toFixed(2), calcHoursRemaining(row.remainingAmount||0).toFixed(2)];
+    const monthVals = setupConfig.monthKeys.flatMap(key => { const d = row.months && row.months[key]; return [d ? d.pct : '', d ? calcCellHours(row.remainingAmount, d).toFixed(2) : '0.00']; });
     lines.push(csvRow([...coreVals, ...monthVals]));
   });
-
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = 'production-waterfall.csv'; a.click();
+  const blob = new Blob([lines.join('\n')], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'production-waterfall.csv'; a.click();
   URL.revokeObjectURL(url);
 }
+function csvRow(values) { return values.map(v => { v = String(v==null?'':v); if (v.includes(',') || v.includes('"') || v.includes('\n')) v = '"' + v.replace(/"/g,'""') + '"'; return v; }).join(','); }
 
-function csvRow(values) {
-  return values.map(v => {
-    v = String(v == null ? '' : v);
-    if (v.includes(',') || v.includes('"') || v.includes('\n'))
-      v = '"' + v.replace(/"/g, '""') + '"';
-    return v;
-  }).join(',');
+// ── Column toggle panel ───────────────────────────────────
+function toggleColumnsPanel() {
+  const panel = document.getElementById('colTogglePanel');
+  if (panel.classList.contains('show')) { panel.classList.remove('show'); }
+  else { buildColTogglePanel(); panel.classList.add('show'); }
 }
-
-// ─── Helpers ──────────────────────────────────────────────
-function parseCurrency(val) {
-  if (val === null || val === undefined || val === '') return 0;
-  if (typeof val === 'number') return val;
-  return parseFloat(String(val).replace(/[$,\s]/g, '')) || 0;
+function closeColumnsPanel() { document.getElementById('colTogglePanel').classList.remove('show'); }
+function buildColTogglePanel() {
+  const panel = document.getElementById('colTogglePanel');
+  panel.innerHTML = '<div class="col-toggle-title">Visible columns</div>';
+  TOGGLEABLE_COLS.forEach(col => {
+    const visible = isColVisible(col);
+    const item = document.createElement('div'); item.className = 'col-toggle-item';
+    const lbl = document.createElement('span'); lbl.className = 'col-toggle-label'; lbl.textContent = col;
+    const sw = document.createElement('label'); sw.className = 'toggle-switch';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; if (visible) cb.checked = true;
+    cb.addEventListener('change', () => toggleColumn(col));
+    const track = document.createElement('span'); track.className = 'toggle-track';
+    sw.appendChild(cb); sw.appendChild(track);
+    item.appendChild(lbl); item.appendChild(sw);
+    panel.appendChild(item);
+  });
 }
-
-function fmtCurrency(n) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+function toggleColumn(col) {
+  if (\!setupConfig.columnVisibility) setupConfig.columnVisibility = {};
+  setupConfig.columnVisibility[col] = \!isColVisible(col);
+  renderResults();
+  buildColTogglePanel();
+  document.getElementById('colTogglePanel').classList.add('show');
+  scheduleSave();
 }
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.col-toggle-wrap');
+  if (wrap && \!wrap.contains(e.target)) closeColumnsPanel();
+});
 
+// ── Helpers ───────────────────────────────────────────────
+function parseCurrency(val) { if (val === null || val === undefined || val === '') return 0; if (typeof val === 'number') return val; return parseFloat(String(val).replace(/[$,\s]/g,''))||0; }
+function fmtCurrency(n) { return new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(n); }
 function fmtHours(h) { return h.toFixed(1) + ' hrs'; }
-
-// ─── UI helpers ───────────────────────────────────────────
 function show(id) { document.getElementById(id).style.display = 'block'; }
-function hide(id) { document.getElementById(id).style.display = 'none';  }
-function showError(msg) {
-  const box = document.getElementById('errorBox');
-  box.textContent = msg;
-  box.style.display = msg ? 'block' : 'none';
-}
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function showError(msg) { const box = document.getElementById('errorBox'); box.textContent = msg; box.style.display = msg ? 'block' : 'none'; }
 </script>
 </body>
 </html>
