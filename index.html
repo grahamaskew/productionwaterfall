@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Production Waterfall</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -675,16 +678,163 @@
     body::before { display: none; }
     .pct-input { border: 1px solid #ccc; background: white; }
   }
+
+  /* ── Login screen ── */
+  #loginScreen {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+
+  #loginScreen.show { display: flex; }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 48px 44px;
+    width: 100%; max-width: 400px;
+    box-shadow: 0 16px 56px rgba(26,31,54,0.12);
+    animation: slideUp 0.3s ease both;
+    position: relative;
+  }
+
+  .login-logo {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  .login-logo img {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #fff; padding: 2px;
+    box-shadow: 0 1px 4px rgba(102,135,225,0.15);
+    object-fit: contain;
+  }
+
+  .login-logo-label {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .login-title {
+    font-size: 28px; font-weight: 600; color: var(--text);
+    letter-spacing: -0.02em; margin-bottom: 6px;
+  }
+
+  .login-title em { font-style: italic; color: var(--accent); }
+
+  .login-subtitle {
+    font-size: 12px; color: var(--text-muted);
+    margin-bottom: 32px; line-height: 1.5;
+  }
+
+  .login-field { margin-bottom: 18px; }
+
+  .login-label {
+    display: block; font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 7px; font-weight: 500;
+  }
+
+  .login-input {
+    width: 100%; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 13px;
+    font-family: 'Geist', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--surface);
+    transition: border-color 0.15s;
+  }
+
+  .login-input:focus { outline: none; border-color: var(--accent); }
+
+  .login-error {
+    display: none; font-size: 11px; color: var(--danger);
+    margin-bottom: 18px; padding: 9px 12px;
+    background: rgba(224,85,85,0.06);
+    border: 1px solid rgba(224,85,85,0.2);
+    border-radius: var(--radius);
+  }
+
+  .login-btn {
+    width: 100%; padding: 12px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius);
+    font-family: 'Geist', sans-serif; font-size: 12px;
+    letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
+    cursor: pointer; transition: background 0.15s;
+    margin-top: 4px;
+  }
+
+  .login-btn:hover { background: #8aa3e8; }
+  .login-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  /* ── User indicator ── */
+  .user-indicator {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .user-email {
+    font-size: 11px; color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .btn-signout {
+    padding: 6px 14px;
+    font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: var(--radius);
+    cursor: pointer; font-family: 'Geist', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .btn-signout:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Saving indicator states ── */
+  .saving-indicator {
+    margin-left: auto; font-size: 10px;
+    color: var(--text-muted); letter-spacing: 0.04em; white-space: nowrap;
+  }
 </style>
 </head>
 <body>
-<div class="container">
+
+<!-- Login screen -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="data:image/webp;base64,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" alt="GA Logo">
+      <span class="login-logo-label">Estimating Tool</span>
+    </div>
+    <div class="login-title">Production<br><em>Waterfall</em></div>
+    <p class="login-subtitle">Sign in to access your pipeline data.</p>
+    <div class="login-field">
+      <label class="login-label" for="loginEmail">Email address</label>
+      <input type="email" id="loginEmail" class="login-input" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" class="login-input" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" id="loginBtn" onclick="signIn()">Sign in</button>
+  </div>
+</div>
+
+<div class="container" id="appContainer" style="display:none">
 
   <!-- Header -->
   <div class="header">
     <div class="header-top">
       <img class="header-logo" src="data:image/webp;base64,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" alt="GA Logo">
       <div class="header-label">Estimating Tool</div>
+      <div class="user-indicator">
+        <span class="user-email" id="userEmailDisplay"></span>
+        <button class="btn-signout" onclick="signOutUser()">Sign out</button>
+      </div>
     </div>
     <h1>Production<br><em>Waterfall</em></h1>
     <p class="header-sub">Upload your estimates workbook to compute accepted items, remaining pipeline value, and projected labour hours by month.</p>
@@ -847,8 +997,19 @@
 </div>
 
 <script>
-// ─── Storage key ──────────────────────────────────────────
-const STORAGE_KEY = 'productionWaterfall_v1';
+// ─── Firebase init ────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            "AIzaSyAVSbSpnIkWycBfMkdh0aTXO3HQv7pEfeQ",
+  authDomain:        "production-waterfall.firebaseapp.com",
+  projectId:         "production-waterfall",
+  storageBucket:     "production-waterfall.firebasestorage.app",
+  messagingSenderId: "849888566410",
+  appId:             "1:849888566410:web:e606366fab951560dd2173",
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
 // ─── Setup config ─────────────────────────────────────────
 const setupConfig = {
@@ -878,55 +1039,148 @@ let pendingDeleteKey = null;
 // ─── Auto-save timer ──────────────────────────────────────
 let saveTimer = null;
 
-// ─── Page load ────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = loadFromStorage();
-  if (saved && saved.setupConfig && saved.setupConfig.startMonth) {
-    Object.assign(setupConfig, saved.setupConfig);
-    // Re-generate month arrays in case they weren't stored
-    if (!setupConfig.monthKeys || !setupConfig.monthKeys.length) {
-      const { keys, labels } = generateMonths(setupConfig.startMonth);
-      setupConfig.monthKeys  = keys;
-      setupConfig.monthLabels = labels;
-    }
-    rowStore = saved.rows || {};
-    if (saved.lastSaved) updateSavedIndicator(saved.lastSaved);
-
-    if (Object.keys(rowStore).length > 0) {
-      renderResults();
-    } else {
-      show('uploadZone');
-    }
+// ─── Auth state listener (replaces DOMContentLoaded init) ─
+auth.onAuthStateChanged(user => {
+  if (user) {
+    // Logged in — show app, hide login screen
+    document.getElementById('loginScreen').classList.remove('show');
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('userEmailDisplay').textContent = user.email;
+    loadUserData(user.uid);
   } else {
-    openSetupModal();
+    // Logged out — show login screen, hide app
+    document.getElementById('loginScreen').classList.add('show');
+    document.getElementById('appContainer').style.display = 'none';
+    // Clear in-memory state
+    rowStore = {};
+    setupConfig.startMonth   = null;
+    setupConfig.laborMix     = 0.28;
+    setupConfig.billableRate = 150;
+    setupConfig.monthKeys    = [];
+    setupConfig.monthLabels  = [];
   }
 });
 
-// ─── Storage ──────────────────────────────────────────────
-function saveToStorage() {
-  const state = {
-    setupConfig: { ...setupConfig },
-    rows: rowStore,
-    lastSaved: new Date().toISOString(),
-  };
+// ─── Login ────────────────────────────────────────────────
+async function signIn() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginBtn');
+
+  errEl.style.display = 'none';
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    updateSavedIndicator(state.lastSaved);
+    await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged will handle the transition
   } catch(e) {
-    console.warn('Could not save:', e);
+    let msg = 'Sign in failed. Please check your email and password.';
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      msg = 'Incorrect email or password.';
+    } else if (e.code === 'auth/too-many-requests') {
+      msg = 'Too many failed attempts. Please try again later.';
+    } else if (e.code === 'auth/network-request-failed') {
+      msg = 'Network error. Please check your connection.';
+    }
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
   }
 }
 
-function loadFromStorage() {
+// Allow Enter key in login form
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') signIn();
+});
+document.getElementById('loginEmail').addEventListener('keydown', e => {
+  if (e.key === 'Enter') signIn();
+});
+
+// ─── Sign out ─────────────────────────────────────────────
+async function signOutUser() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch(e) { return null; }
+    clearTimeout(saveTimer);
+    await auth.signOut();
+    // onAuthStateChanged handles the rest
+    document.getElementById('userEmailDisplay').textContent = '';
+    document.getElementById('savedIndicator').textContent   = '';
+    hide('results');
+    hide('uploadZone');
+    hide('processing');
+    document.getElementById('uploadCancel').style.display = 'none';
+    document.getElementById('rowPicker').style.display    = 'none';
+    document.getElementById('tableHead').innerHTML = '';
+    document.getElementById('tableBody').innerHTML = '';
+    document.getElementById('pipelineTotal').textContent = '—';
+  } catch(e) {
+    console.warn('Sign out error:', e);
+  }
+}
+
+// ─── Firestore: load user data ────────────────────────────
+async function loadUserData(uid) {
+  try {
+    const docSnap = await db.collection('users').doc(uid)
+                             .collection('data').doc('appState').get();
+    if (docSnap.exists) {
+      const saved = docSnap.data();
+      if (saved && saved.setupConfig && saved.setupConfig.startMonth) {
+        Object.assign(setupConfig, saved.setupConfig);
+        if (!setupConfig.monthKeys || !setupConfig.monthKeys.length) {
+          const { keys, labels } = generateMonths(setupConfig.startMonth);
+          setupConfig.monthKeys   = keys;
+          setupConfig.monthLabels = labels;
+        }
+        rowStore = saved.rows || {};
+        if (saved.lastSaved) updateSavedIndicator(saved.lastSaved);
+        if (Object.keys(rowStore).length > 0) {
+          renderResults();
+        } else {
+          show('uploadZone');
+        }
+      } else {
+        openSetupModal();
+      }
+    } else {
+      openSetupModal();
+    }
+  } catch(e) {
+    console.error('Could not load data from Firestore:', e);
+    openSetupModal();
+  }
+}
+
+// ─── Firestore: save user data ────────────────────────────
+async function saveToFirestore() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const state = {
+    setupConfig: { ...setupConfig },
+    rows:        rowStore,
+    lastSaved:   new Date().toISOString(),
+  };
+  try {
+    await db.collection('users').doc(user.uid)
+            .collection('data').doc('appState').set(state);
+    updateSavedIndicator(state.lastSaved);
+  } catch(e) {
+    console.warn('Could not save to Firestore:', e);
+  }
 }
 
 function scheduleSave() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToStorage, 600);
+  saveTimer = setTimeout(saveToFirestore, 600);
 }
 
 // ─── Saved indicator ──────────────────────────────────────
@@ -1032,7 +1286,13 @@ function cancelReset() {
 }
 
 function confirmResetAll() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  // Delete from Firestore
+  const user = auth.currentUser;
+  if (user) {
+    db.collection('users').doc(user.uid)
+      .collection('data').doc('appState').delete()
+      .catch(e => console.warn('Could not delete Firestore document:', e));
+  }
   rowStore = {};
   setupConfig.startMonth   = null;
   setupConfig.laborMix     = 0.28;
