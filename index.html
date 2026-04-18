@@ -49,7 +49,15 @@
   .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
   .section-title{font-size:20px;color:var(--text);}
   .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:3px 10px;border-radius:20px;}
-  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:auto;margin-bottom:32px;max-height:520px;background:var(--surface);}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:auto;margin-bottom:32px;background:var(--surface);}
+  .header.results-active{margin-bottom:16px;}
+  .header.results-active .header-sub{display:none;}
+  .header.results-active h1{font-size:22px;line-height:1.1;}
+  .header.results-active .header-top{margin-bottom:6px;}
+  .header.results-active .header-label{margin-bottom:4px;}
+  .pipeline-total.compact{padding:10px 20px;margin-bottom:16px;}
+  .pipeline-total.compact .total-value{font-size:22px;}
+  .pipeline-total.compact .total-label{margin-bottom:2px;}
   table{width:100%;border-collapse:collapse;font-size:12px;}
   thead{position:sticky;top:0;z-index:2;}
   thead tr:first-child th{background:var(--surface2);color:var(--accent);font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:10px 14px;text-align:left;font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap;}
@@ -74,6 +82,7 @@
   .pct-input{width:58px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Geist',sans-serif;font-size:11px;color:var(--text);background:var(--surface);text-align:right;-moz-appearance:textfield;transition:border-color .15s;}
   .pct-input::-webkit-inner-spin-button,.pct-input::-webkit-outer-spin-button{-webkit-appearance:none;}
   .pct-input:focus{outline:none;border-color:var(--accent);background:var(--accent-light);}
+  .pct-input.filled{border-color:#2a7a3b;}
   .pct-suffix{font-size:10px;color:var(--text-muted);}
   .cell-hours{font-size:10px;color:var(--text-muted);text-align:center;font-variant-numeric:tabular-nums;min-height:14px;}
   .cell-hours.has-value{color:var(--accent-dim);font-weight:500;}
@@ -418,6 +427,8 @@ function signOutUser() {
   document.getElementById('tableHead').innerHTML = '';
   document.getElementById('tableBody').innerHTML = '';
   document.getElementById('pipelineTotal').textContent = '\u2014';
+  document.querySelector('.header').classList.remove('results-active');
+  document.querySelector('.pipeline-total').classList.remove('compact');
 }
 
 function loadUserData(uid) {
@@ -510,6 +521,8 @@ function confirmResetAll() {
   document.getElementById('tableBody').innerHTML='';
   document.getElementById('pipelineTotal').textContent='\u2014';
   document.getElementById('savedIndicator').textContent='';
+  document.querySelector('.header').classList.remove('results-active');
+  document.querySelector('.pipeline-total').classList.remove('compact');
   showError('');
   openSetupModal();
 }
@@ -692,7 +705,7 @@ function renderResults(){
         var cd=row.months&&row.months[monthKey],sp=cd?cd.pct:null;
         var pw=document.createElement('div');pw.className='pct-wrap';
         var inp=document.createElement('input');inp.type='number';inp.className='pct-input';inp.min='0';inp.step='0.1';inp.placeholder='0';
-        if(sp!==null&&sp!==0)inp.value=sp;
+        if(sp!==null&&sp!==0){inp.value=sp;inp.classList.add('filled');}
         var sfx=document.createElement('span');sfx.className='pct-suffix';sfx.textContent='%';
         pw.appendChild(inp);pw.appendChild(sfx);
         var hd=document.createElement('div');hd.id='hours_'+rowKey+'_'+monthKey;
@@ -708,13 +721,15 @@ function renderResults(){
   var cnt=rows.length;
   document.getElementById('rowBadge').textContent=cnt+' row'+(cnt!==1?'s':'');
   hide('processing');hide('uploadZone');document.getElementById('uploadCancel').style.display='none';show('results');
+  document.querySelector('.header').classList.add('results-active');
+  document.querySelector('.pipeline-total').classList.add('compact');
 }
 
 function handlePctInput(rowKey,monthKey,input,hoursDiv){
   var raw=input.value.trim(),val=raw===''?null:(parseFloat(raw)||0);
   var row=rowStore[rowKey];if(!row)return;if(!row.months)row.months={};
-  if(val===null||val===0){delete row.months[monthKey];hoursDiv.textContent='\u2014';hoursDiv.className='cell-hours';}
-  else{row.months[monthKey]={pct:val,laborMix:setupConfig.laborMix,billableRate:setupConfig.billableRate};hoursDiv.textContent=fmtHours(calcCellHours(row.remainingAmount,row.months[monthKey]));hoursDiv.className='cell-hours has-value';}
+  if(val===null||val===0){delete row.months[monthKey];hoursDiv.textContent='\u2014';hoursDiv.className='cell-hours';input.classList.remove('filled');}
+  else{row.months[monthKey]={pct:val,laborMix:setupConfig.laborMix,billableRate:setupConfig.billableRate};hoursDiv.textContent=fmtHours(calcCellHours(row.remainingAmount,row.months[monthKey]));hoursDiv.className='cell-hours has-value';input.classList.add('filled');}
   updateMonthTotal(monthKey);scheduleSave();
   if(val!==null&&val>100){showPctWarning('A single entry exceeds 100% \u2014 you entered '+val.toFixed(1)+'%.');return;}
   if(val!==null){var rt=setupConfig.monthKeys.reduce(function(s,k){var d=row.months&&row.months[k];return s+(d?d.pct:0);},0);if(rt>100)showPctWarning('The total percentage across all months for this row is '+rt.toFixed(1)+'%, which exceeds 100%.');}
