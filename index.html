@@ -634,6 +634,7 @@ function buildPipelineFromRows(allRows,headerIdx){
   var colsToSearch=colMap.slice(2);
   rawRows=rawRows.filter(function(row){return!colsToSearch.some(function(col){return RFP.some(function(p){return p.test(String(row[col]||'').trim());});});});
   rawRows=rawRows.map(function(row){return Object.assign({},row,{'Amount':parseCurrency(row['Amount']),'Invoiced Amount':parseCurrency(row['Invoiced Amount']),'Remaining Amount':parseCurrency(row['Remaining Amount'])});});
+  rawRows=rawRows.filter(function(row){return row['Remaining Amount']>0;});
   mergeRows(rawRows);
   uploadingFromResults=false;fileInput.value='';
   renderResults();scheduleSave();
@@ -646,6 +647,7 @@ function mergeRows(newRows){
     if(ex){newStore[key]=Object.assign({},ex,{name:row['Name']||ex.name,num:String(row['Num']||ex.num),date:row['Date']||ex.date||'',amount:row['Amount'],invoicedAmount:row['Invoiced Amount'],remainingAmount:row['Remaining Amount']});}
     else{newStore[key]={name:row['Name']||'',num:String(row['Num']||''),date:row['Date']||'',amount:row['Amount'],invoicedAmount:row['Invoiced Amount'],remainingAmount:row['Remaining Amount'],months:{}};}
   });
+  Object.keys(newStore).forEach(function(k){if(!(newStore[k].remainingAmount>0))delete newStore[k];});
   rowStore=newStore;
 }
 
