@@ -175,6 +175,22 @@
   .toggle-track::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s;}
   .toggle-switch input:checked + .toggle-track{background:var(--accent);}
   .toggle-switch input:checked + .toggle-track::after{transform:translateX(14px);}
+  .source-selector{display:flex;align-items:center;gap:8px;margin-bottom:20px;justify-content:center;flex-wrap:wrap;}
+  .source-selector-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);font-weight:500;margin-right:4px;}
+  .source-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);font-family:'Geist',sans-serif;font-size:11px;letter-spacing:.06em;cursor:pointer;transition:all .15s;}
+  .source-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .source-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
+  .source-badge{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:10px;background:var(--accent-light);color:var(--accent);border:1px solid var(--border);margin-left:6px;vertical-align:middle;}
+  .mapping-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+  .mapping-table th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:7px 10px;border-bottom:1px solid var(--border);font-weight:500;}
+  .mapping-table td{padding:6px 10px;border-bottom:1px solid rgba(212,218,240,.5);vertical-align:middle;}
+  .mapping-table tr:last-child td{border-bottom:none;}
+  .mapping-table .field-col{font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;}
+  .mapping-table .qb-col{font-size:11px;color:var(--text-muted);}
+  .mapping-input{width:100%;border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-family:'Geist',sans-serif;font-size:11px;color:var(--text);background:var(--surface);-moz-appearance:textfield;}
+  .mapping-input:focus{outline:none;border-color:var(--accent);}
+  .mapping-rfp{display:flex;gap:24px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .mapping-rfp label{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:7px;cursor:pointer;}
   @media print{
     .action-bar,.modal-overlay{display:none !important;}
     body{background:white;}
@@ -221,6 +237,12 @@
   </div>
 
   <div class="upload-zone" id="uploadZone" style="display:none">
+    <div class="source-selector" onclick="event.stopPropagation()">
+      <span class="source-selector-label">Source</span>
+      <button class="source-btn" data-source="quickbooks" onclick="setActiveSource('quickbooks',event)">QuickBooks</button>
+      <button class="source-btn" data-source="wequote" onclick="setActiveSource('wequote',event)">WeQuote</button>
+      <button class="source-btn" data-source="ipoint" onclick="setActiveSource('ipoint',event)">iPoint</button>
+    </div>
     <div class="upload-icon">&#8593;</div>
     <div class="upload-title">Drop your workbook here</div>
     <p class="upload-hint">or <span>click to browse</span> &nbsp;&middot;&nbsp; .xlsx / .xls / .csv accepted</p>
@@ -234,7 +256,7 @@
   <div class="row-picker" id="rowPicker">
     <div class="row-picker-icon">?</div>
     <div class="row-picker-title">Select the header row</div>
-    <p class="row-picker-hint">The app could not automatically detect the column headers (<em>Status</em> and <em>Remaining Amount</em>). Select the row below that contains your column headers.</p>
+    <p class="row-picker-hint">The app could not automatically detect the column headers for the selected source. Select the row below that contains your column headers.</p>
     <div class="row-picker-list" id="rowPickerList"></div>
     <div class="row-picker-actions">
       <button class="btn btn-primary" onclick="confirmHeaderRow()">Confirm</button>
@@ -269,6 +291,10 @@
       <div class="modal-actions" style="margin-top:28px;">
         <button class="btn btn-primary" onclick="saveSetup()">Confirm</button>
         <button class="btn btn-outline" id="setupCancelBtn" style="display:none" onclick="closeSetupModal()">Cancel</button>
+      </div>
+      <div id="adminMappingsSection" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:8px;">Admin</div>
+        <button class="btn btn-outline btn-sm" onclick="openMappingModal()">&#9881;&nbsp; Source Mappings</button>
       </div>
       <div class="danger-zone" id="dangerZone">
         <hr class="setup-divider" style="margin-top:28px;margin-bottom:20px;">
@@ -316,6 +342,18 @@
       <div class="modal-actions">
         <button class="btn btn-reset" onclick="confirmDeleteRow()">Delete</button>
         <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="mappingModalOverlay">
+    <div class="modal" style="max-width:600px;max-height:88vh;overflow-y:auto;">
+      <div class="modal-title">Source Mappings</div>
+      <p class="modal-body" style="margin-bottom:16px;">Define the column names used by each source. QuickBooks columns are fixed. Leave a field blank or enter <em>n/a</em> to omit it.</p>
+      <div id="mappingModalContent"></div>
+      <div class="modal-actions" style="margin-top:20px;">
+        <button class="btn btn-primary" onclick="saveMappings()">Save</button>
+        <button class="btn btn-outline" onclick="closeMappingModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -369,11 +407,41 @@ firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 var db = firebase.firestore();
 
-var setupConfig = { startMonth:null, laborMix:0.28, billableRate:150, monthKeys:[], monthLabels:[], columnVisibility:{} };
+var ADMIN_EMAIL = 'gaskew44@gmail.com';
+
+var DEFAULT_SOURCE_MAPPINGS = {
+  quickbooks: {
+    label:'QuickBooks',
+    fields:{name:'NAME',num:'NUM',date:'DATE',amount:'AMOUNT',invoicedAmount:'INVOICED AMOUNT',remainingAmount:'REMAINING AMOUNT'},
+    statusCol:'STATUS', statusVal:'accepted', rfpFilter:true,
+    displayNames:{name:'Name',num:'Num',date:'Date',amount:'Amount',invoicedAmount:'Invoiced Amount',remainingAmount:'Remaining Amount'}
+  },
+  wequote: {
+    label:'WeQuote',
+    fields:{name:'PROJECT NAME',num:'QUOTE NUMBER',date:null,amount:'TOTAL SELL NO TAX',invoicedAmount:'PAID',remainingAmount:'NOT INVOICED'},
+    statusCol:'QUOTE STATUS', statusVal:'accepted', rfpFilter:true,
+    displayNames:{name:'Project Name',num:'Quote Number',date:null,amount:'Total Sell No Tax',invoicedAmount:'Paid',remainingAmount:'Not Invoiced'}
+  },
+  ipoint: {
+    label:'iPoint',
+    fields:{name:'client_Name',num:'id_Serial',date:null,amount:'total_Grand',invoicedAmount:'total_Invoiced',remainingAmount:'Total_Price_Parts_And_Labor'},
+    statusCol:null, statusVal:null, rfpFilter:false,
+    displayNames:{name:'Name',num:'Num',date:null,amount:'Amount',invoicedAmount:'Invoiced Amount',remainingAmount:'Remaining Amount'}
+  }
+};
+var sourceMappings = JSON.parse(JSON.stringify(DEFAULT_SOURCE_MAPPINGS));
+
+var setupConfig = { startMonth:null, laborMix:0.28, billableRate:150, monthKeys:[], monthLabels:[], columnVisibility:{}, activeSource:'quickbooks' };
 var rowStore = {};
 var pendingAllRows=null, selectedHeaderIdx=null, pendingHeaderIdx=null, hasHiddenRows=false, uploadingFromResults=false;
 var pendingDeleteKey=null, saveTimer=null;
 var TOGGLEABLE_COLS = ['Name','Num','Date','Amount','Invoiced Amount','Remaining Amount'];
+
+function getActiveSource(){return setupConfig.activeSource||'quickbooks';}
+function getSourceMapping(){return sourceMappings[getActiveSource()]||sourceMappings.quickbooks;}
+function getColDisplayName(internalCol){var src=getSourceMapping();var map={'Name':src.displayNames.name,'Num':src.displayNames.num,'Date':src.displayNames.date,'Amount':src.displayNames.amount,'Invoiced Amount':src.displayNames.invoicedAmount,'Remaining Amount':src.displayNames.remainingAmount};return map[internalCol]||internalCol;}
+function setActiveSource(src,e){if(e)e.stopPropagation();setupConfig.activeSource=src;document.querySelectorAll('.source-btn').forEach(function(b){b.classList.toggle('active',b.dataset.source===src);});if(!setupConfig.columnVisibility)setupConfig.columnVisibility={};setupConfig.columnVisibility['Date']=!!(sourceMappings[src]&&sourceMappings[src].fields&&sourceMappings[src].fields.date);}
+function initSourceSelector(){var active=getActiveSource();document.querySelectorAll('.source-btn').forEach(function(b){b.classList.toggle('active',b.dataset.source===active);});}
 
 function isColVisible(col) {
   if (TOGGLEABLE_COLS.indexOf(col) === -1) return true;
@@ -391,7 +459,7 @@ auth.onAuthStateChanged(function(user) {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('appContainer').style.display = 'none';
     rowStore = {};
-    setupConfig = { startMonth:null, laborMix:0.28, billableRate:150, monthKeys:[], monthLabels:[], columnVisibility:{} };
+    setupConfig = { startMonth:null, laborMix:0.28, billableRate:150, monthKeys:[], monthLabels:[], columnVisibility:{}, activeSource:'quickbooks' };
   }
 });
 
@@ -432,22 +500,33 @@ function signOutUser() {
 }
 
 function loadUserData(uid) {
-  db.collection('users').doc(uid).collection('data').doc('appState').get().then(function(snap) {
-    if (snap.exists) {
-      var saved = snap.data();
-      if (saved && saved.setupConfig && saved.setupConfig.startMonth) {
-        Object.assign(setupConfig, saved.setupConfig);
-        if (!setupConfig.columnVisibility) setupConfig.columnVisibility = {};
-        if (!setupConfig.monthKeys || !setupConfig.monthKeys.length) {
-          var r = generateMonths(setupConfig.startMonth);
-          setupConfig.monthKeys = r.keys; setupConfig.monthLabels = r.labels;
-        }
-        rowStore = saved.rows || {};
-        if (saved.lastSaved) updateSavedIndicator(saved.lastSaved);
-        if (Object.keys(rowStore).length > 0) renderResults(); else show('uploadZone');
-      } else { openSetupModal(); }
-    } else { openSetupModal(); }
-  }).catch(function(e) { console.error(e); openSetupModal(); });
+  loadSharedConfig(function() {
+    db.collection('users').doc(uid).collection('data').doc('appState').get().then(function(snap) {
+      if (snap.exists) {
+        var saved = snap.data();
+        if (saved && saved.setupConfig && saved.setupConfig.startMonth) {
+          Object.assign(setupConfig, saved.setupConfig);
+          if (!setupConfig.columnVisibility) setupConfig.columnVisibility = {};
+          if (!setupConfig.activeSource) setupConfig.activeSource = 'quickbooks';
+          if (!setupConfig.monthKeys || !setupConfig.monthKeys.length) {
+            var r = generateMonths(setupConfig.startMonth);
+            setupConfig.monthKeys = r.keys; setupConfig.monthLabels = r.labels;
+          }
+          rowStore = saved.rows || {};
+          if (saved.lastSaved) updateSavedIndicator(saved.lastSaved);
+          initSourceSelector();
+          if (Object.keys(rowStore).length > 0) renderResults(); else show('uploadZone');
+        } else { initSourceSelector(); openSetupModal(); }
+      } else { initSourceSelector(); openSetupModal(); }
+    }).catch(function(e) { console.error(e); initSourceSelector(); openSetupModal(); });
+  });
+}
+
+function loadSharedConfig(callback) {
+  db.collection('config').doc('sourceMappings').get().then(function(snap) {
+    if (snap.exists) { var data = snap.data(); if (data && data.mappings) sourceMappings = data.mappings; }
+    if (callback) callback();
+  }).catch(function(e) { console.warn('Could not load shared config:', e); if (callback) callback(); });
 }
 
 function saveToFirestore() {
@@ -480,6 +559,8 @@ function openSetupModal() {
   document.getElementById('dangerZone').style.display = hasData ? 'block' : 'none';
   document.getElementById('resetConfirmPanel').style.display = 'none';
   document.getElementById('resetTriggerBtn').style.display = 'block';
+  var adminEl = document.getElementById('adminMappingsSection');
+  if (adminEl) { var cu = auth.currentUser; adminEl.style.display = (cu && cu.email === ADMIN_EMAIL) ? 'block' : 'none'; }
   document.getElementById('setupModalOverlay').classList.add('show');
 }
 function openSettingsModal() { openSetupModal(); }
@@ -511,7 +592,7 @@ function confirmResetAll() {
   var user=auth.currentUser;
   if(user) db.collection('users').doc(user.uid).collection('data').doc('appState').delete().catch(function(e){console.warn(e);});
   rowStore={};
-  setupConfig={startMonth:null,laborMix:0.28,billableRate:150,monthKeys:[],monthLabels:[],columnVisibility:{}};
+  setupConfig={startMonth:null,laborMix:0.28,billableRate:150,monthKeys:[],monthLabels:[],columnVisibility:{},activeSource:'quickbooks'};
   pendingDeleteKey=null; uploadingFromResults=false;
   closeSetupModal();
   hide('results'); hide('uploadZone'); hide('processing');
@@ -590,7 +671,13 @@ function processRawRows(allRows,filtersDetected){
 }
 
 function findHeaderRow(allRows){
-  for(var i=0;i<allRows.length;i++){var row=allRows[i].map(function(c){return String(c||'').trim().toLowerCase();});if(row.some(function(c){return c==='status';})&&row.some(function(c){return c.replace(/\s+/g,' ')==='remaining amount';}))return i;}
+  var src=getSourceMapping();
+  var remAmt=src.fields.remainingAmount?src.fields.remainingAmount.toLowerCase().replace(/\s+/g,' '):null;
+  if(!remAmt)return -1;
+  for(var i=0;i<allRows.length;i++){
+    var row=allRows[i].map(function(c){return String(c||'').trim().toLowerCase().replace(/\s+/g,' ');});
+    if(row.indexOf(remAmt)>-1)return i;
+  }
   return -1;
 }
 
@@ -622,20 +709,33 @@ function confirmHeaderRow(){
 function cancelRowPicker(){document.getElementById('rowPicker').style.display='none';cancelUpload();}
 
 function buildPipelineFromRows(allRows,headerIdx){
+  var src=getSourceMapping();
+  var fields=src.fields;
   var headerRow=allRows[headerIdx];
-  var colMap=headerRow.map(function(h,i){return i===0?'Name':(h!==null&&h!==undefined&&String(h).trim()!=='')?String(h).trim():'__col'+i;});
-  var rawRows=allRows.slice(headerIdx+1).filter(function(r){return r.some(function(c){return c!==null&&c!=='';});}).map(function(r){var o={};colMap.forEach(function(col,i){o[col]=r[i]!==undefined?r[i]:null;});return o;});
+  var normHeader=headerRow.map(function(h){return String(h||'').trim().toLowerCase().replace(/\s+/g,' ');});
+  function findColIdx(colName){if(!colName)return -1;return normHeader.indexOf(colName.toLowerCase().replace(/\s+/g,' '));}
+  var nameIdx=findColIdx(fields.name);
+  if(nameIdx===-1&&getActiveSource()==='quickbooks')nameIdx=0;
+  var numIdx=findColIdx(fields.num);
+  var dateIdx=fields.date?findColIdx(fields.date):-1;
+  var amountIdx=findColIdx(fields.amount);
+  var invoicedIdx=findColIdx(fields.invoicedAmount);
+  var remainingIdx=findColIdx(fields.remainingAmount);
+  var statusIdx=src.statusCol?findColIdx(src.statusCol):-1;
+  if(remainingIdx===-1){showError('Could not find the Remaining Amount column. Please check the source selection.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
+  var rawRows=allRows.slice(headerIdx+1).filter(function(r){return r.some(function(c){return c!==null&&c!=='';});});
   if(!rawRows||rawRows.length===0){showError('No data rows found after the header row.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
+  if(src.statusCol&&src.statusVal&&statusIdx>-1){rawRows=rawRows.filter(function(row){return String(row[statusIdx]||'').trim().toLowerCase()===src.statusVal.toLowerCase();});}
+  if(src.rfpFilter){var RFP=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];rawRows=rawRows.filter(function(row){return!row.some(function(cell){return RFP.some(function(p){return p.test(String(cell||'').trim());});});});}
   var lastName=null;
-  rawRows=rawRows.map(function(row){var r=Object.assign({},row),v=r['Name'];if(v!==null&&v!==undefined&&String(v).trim()!=='')lastName=String(v).trim();r['Name']=lastName||'';return r;});
-  rawRows=rawRows.map(function(row){return Object.assign({},row,{'Num':row['Num']==null?'':row['Num'],'Status':row['Status']==null?'':row['Status']});});
-  rawRows=rawRows.filter(function(row){return row['Status']==='Accepted';});
-  var RFP=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];
-  var colsToSearch=colMap.slice(2);
-  rawRows=rawRows.filter(function(row){return!colsToSearch.some(function(col){return RFP.some(function(p){return p.test(String(row[col]||'').trim());});});});
-  rawRows=rawRows.map(function(row){return Object.assign({},row,{'Amount':parseCurrency(row['Amount']),'Invoiced Amount':parseCurrency(row['Invoiced Amount']),'Remaining Amount':parseCurrency(row['Remaining Amount'])});});
-  rawRows=rawRows.filter(function(row){return row['Remaining Amount']>0;});
-  mergeRows(rawRows);
+  var mappedRows=rawRows.map(function(row){
+    var nameVal=nameIdx>-1?row[nameIdx]:null;
+    if(nameVal!==null&&nameVal!==undefined&&String(nameVal).trim()!=='')lastName=String(nameVal).trim();
+    return{name:lastName||'',num:numIdx>-1&&row[numIdx]!=null?String(row[numIdx]):'',date:dateIdx>-1&&row[dateIdx]!=null?String(row[dateIdx]):'',amount:parseCurrency(amountIdx>-1?row[amountIdx]:null),invoicedAmount:parseCurrency(invoicedIdx>-1?row[invoicedIdx]:null),remainingAmount:parseCurrency(remainingIdx>-1?row[remainingIdx]:null)};
+  });
+  mappedRows=mappedRows.filter(function(row){return row.remainingAmount>0;});
+  if(mappedRows.length===0){showError('No qualifying rows found. Check that your file has accepted entries with a remaining balance.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
+  mergeRows(mappedRows);
   uploadingFromResults=false;fileInput.value='';
   renderResults();scheduleSave();
 }
@@ -643,9 +743,9 @@ function buildPipelineFromRows(allRows,headerIdx){
 function mergeRows(newRows){
   var newStore={};
   newRows.forEach(function(row){
-    var key=makeRowKey(row['Name'],row['Num']),ex=rowStore[key];
-    if(ex){newStore[key]=Object.assign({},ex,{name:row['Name']||ex.name,num:String(row['Num']||ex.num),date:row['Date']||ex.date||'',amount:row['Amount'],invoicedAmount:row['Invoiced Amount'],remainingAmount:row['Remaining Amount']});}
-    else{newStore[key]={name:row['Name']||'',num:String(row['Num']||''),date:row['Date']||'',amount:row['Amount'],invoicedAmount:row['Invoiced Amount'],remainingAmount:row['Remaining Amount'],months:{}};}
+    var key=makeRowKey(row.name,row.num),ex=rowStore[key];
+    if(ex){newStore[key]=Object.assign({},ex,{name:row.name||ex.name,num:row.num||ex.num,date:row.date||ex.date||'',amount:row.amount,invoicedAmount:row.invoicedAmount,remainingAmount:row.remainingAmount});}
+    else{newStore[key]={name:row.name||'',num:row.num||'',date:row.date||'',amount:row.amount,invoicedAmount:row.invoicedAmount,remainingAmount:row.remainingAmount,months:{}};}
   });
   Object.keys(newStore).forEach(function(k){if(!(newStore[k].remainingAmount>0))delete newStore[k];});
   rowStore=newStore;
@@ -657,7 +757,7 @@ function renderResults(){
   document.getElementById('pipelineTotal').textContent=fmtCurrency(total);
   var coreCols=['Name','Num','Date','Amount','Invoiced Amount','Remaining Amount','Hours Remaining'];
   var headHtml='<tr><th class="del-th"></th>';
-  coreCols.forEach(function(c){if(!isColVisible(c))return;headHtml+='<th>'+c+'</th>';});
+  coreCols.forEach(function(c){if(!isColVisible(c))return;headHtml+='<th>'+(c==='Hours Remaining'?c:getColDisplayName(c))+'</th>';});
   setupConfig.monthLabels.forEach(function(lbl){headHtml+='<th class="month-th">'+lbl+'</th>';});
   headHtml+='</tr><tr id="totalHoursRow"><td class="del-spacer"></td>';
   var first=true;
@@ -752,8 +852,9 @@ function closePctWarning(){document.getElementById('pctWarningOverlay').classLis
 
 function exportCSV(){
   var coreCols=['Name','Num','Date','Amount','Invoiced Amount','Remaining Amount','Hours Remaining'];
+  var displayCols=coreCols.map(function(c){return c==='Hours Remaining'?c:getColDisplayName(c);});
   var mh=setupConfig.monthLabels.reduce(function(a,l){return a.concat([l+' %',l+' hrs']);},[]);
-  var lines=[csvRow(coreCols.concat(mh))];
+  var lines=[csvRow(displayCols.concat(mh))];
   var hrt=Object.values(rowStore).reduce(function(s,r){return s+calcHoursRemaining(r.remainingAmount||0);},0);
   var tv=setupConfig.monthKeys.reduce(function(a,key){var t=Object.values(rowStore).reduce(function(s,r){var d=r.months&&r.months[key];return s+(d?calcCellHours(r.remainingAmount,d):0);},0);return a.concat(['',t.toFixed(2)]);},[]);
   var trc=coreCols.map(function(c,i){if(i===0)return'Total hours';if(c==='Hours Remaining')return hrt.toFixed(2);return'';});
@@ -774,7 +875,7 @@ function buildColTogglePanel(){
   var p=document.getElementById('colTogglePanel');p.innerHTML='<div class="col-toggle-title">Visible columns</div>';
   TOGGLEABLE_COLS.forEach(function(col){
     var vis=isColVisible(col),item=document.createElement('div');item.className='col-toggle-item';
-    var lbl=document.createElement('span');lbl.className='col-toggle-label';lbl.textContent=col;
+    var lbl=document.createElement('span');lbl.className='col-toggle-label';lbl.textContent=getColDisplayName(col);
     var sw=document.createElement('label');sw.className='toggle-switch';
     var cb=document.createElement('input');cb.type='checkbox';if(vis)cb.checked=true;
     cb.addEventListener('change',function(){toggleColumn(col);});
@@ -795,6 +896,56 @@ function fmtHours(h){return h.toFixed(1)+' hrs';}
 function show(id){document.getElementById(id).style.display='block';}
 function hide(id){document.getElementById(id).style.display='none';}
 function showError(msg){var b=document.getElementById('errorBox');b.textContent=msg;b.style.display=msg?'block':'none';}
+
+function openMappingModal(){buildMappingModal();document.getElementById('mappingModalOverlay').classList.add('show');}
+function closeMappingModal(){document.getElementById('mappingModalOverlay').classList.remove('show');}
+function buildMappingModal(){
+  var container=document.getElementById('mappingModalContent');container.innerHTML='';
+  var sources=['wequote','ipoint'];
+  var fieldLabels={name:'Name / Project Name',num:'Number / ID',date:'Date',amount:'Total Amount',invoicedAmount:'Invoiced / Paid',remainingAmount:'Remaining Amount'};
+  sources.forEach(function(srcKey){
+    var src=sourceMappings[srcKey];
+    var section=document.createElement('div');section.style.marginBottom='20px';
+    var heading=document.createElement('div');heading.style.cssText='font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:8px;';heading.textContent=src.label;section.appendChild(heading);
+    var tbl=document.createElement('table');tbl.className='mapping-table';
+    var thead=document.createElement('thead');thead.innerHTML='<tr><th>Field</th><th>Column name in source file</th></tr>';tbl.appendChild(thead);
+    var tbody=document.createElement('tbody');
+    ['name','num','date','amount','invoicedAmount','remainingAmount'].forEach(function(fk){
+      var tr=document.createElement('tr');
+      var tdL=document.createElement('td');tdL.className='field-col';tdL.textContent=fieldLabels[fk];
+      var tdI=document.createElement('td');
+      var inp=document.createElement('input');inp.type='text';inp.className='mapping-input';inp.dataset.source=srcKey;inp.dataset.field=fk;inp.value=src.fields[fk]||'';inp.placeholder='n/a';
+      tdI.appendChild(inp);tr.appendChild(tdL);tr.appendChild(tdI);tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);section.appendChild(tbl);
+    var statusDiv=document.createElement('div');statusDiv.style.cssText='margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;';
+    function addStatusField(labelText,fieldName,val,w){
+      var lbl=document.createElement('span');lbl.style.cssText='font-size:11px;color:var(--text-muted);white-space:nowrap;';lbl.textContent=labelText;
+      var inp=document.createElement('input');inp.type='text';inp.className='mapping-input';inp.style.width=w||'130px';inp.dataset.source=srcKey;inp.dataset.field=fieldName;inp.value=val||'';inp.placeholder='n/a';
+      statusDiv.appendChild(lbl);statusDiv.appendChild(inp);
+    }
+    addStatusField('Status column:','__statusCol',src.statusCol,'140px');
+    addStatusField('Accepted value:','__statusVal',src.statusVal,'110px');
+    section.appendChild(statusDiv);
+    var rfpDiv=document.createElement('div');rfpDiv.style.cssText='margin-top:10px;';
+    var rfpLbl=document.createElement('label');rfpLbl.style.cssText='font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:7px;cursor:pointer;';
+    var rfpCb=document.createElement('input');rfpCb.type='checkbox';rfpCb.dataset.source=srcKey;rfpCb.dataset.field='__rfpFilter';rfpCb.checked=!!src.rfpFilter;
+    rfpLbl.appendChild(rfpCb);rfpLbl.appendChild(document.createTextNode('Filter out RFP rows'));rfpDiv.appendChild(rfpLbl);section.appendChild(rfpDiv);
+    if(sources.indexOf(srcKey)<sources.length-1){var sep=document.createElement('hr');sep.style.cssText='border:none;border-top:1px solid var(--border);margin:20px 0 0;';section.appendChild(sep);}
+    container.appendChild(section);
+  });
+}
+function saveMappings(){
+  document.querySelectorAll('#mappingModalContent [data-source]').forEach(function(inp){
+    var srcKey=inp.dataset.source,field=inp.dataset.field;
+    if(!sourceMappings[srcKey])return;
+    if(field==='__statusCol'){sourceMappings[srcKey].statusCol=inp.value.trim()||null;}
+    else if(field==='__statusVal'){sourceMappings[srcKey].statusVal=inp.value.trim()||null;}
+    else if(field==='__rfpFilter'){sourceMappings[srcKey].rfpFilter=inp.checked;}
+    else{var val=inp.value.trim();sourceMappings[srcKey].fields[field]=(val===''||val.toLowerCase()==='n/a')?null:val;}
+  });
+  db.collection('config').doc('sourceMappings').set({mappings:sourceMappings}).then(function(){closeMappingModal();}).catch(function(e){console.warn('Could not save mappings:',e);closeMappingModal();});
+}
 </script>
 </body>
 </html>
