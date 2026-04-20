@@ -710,28 +710,54 @@ function cancelRowPicker(){document.getElementById('rowPicker').style.display='n
 
 function buildPipelineFromRows(allRows,headerIdx){
   var src=getSourceMapping();
-  var fields=src.fields;
+  var active=getActiveSource();
   var headerRow=allRows[headerIdx];
-  var normHeader=headerRow.map(function(h){return String(h||'').trim().toLowerCase().replace(/\s+/g,' ');});
-  function findColIdx(colName){if(!colName)return -1;return normHeader.indexOf(colName.toLowerCase().replace(/\s+/g,' '));}
-  var nameIdx=findColIdx(fields.name);
-  if(nameIdx===-1&&getActiveSource()==='quickbooks')nameIdx=0;
-  var numIdx=findColIdx(fields.num);
-  var dateIdx=fields.date?findColIdx(fields.date):-1;
-  var amountIdx=findColIdx(fields.amount);
-  var invoicedIdx=findColIdx(fields.invoicedAmount);
-  var remainingIdx=findColIdx(fields.remainingAmount);
-  var statusIdx=src.statusCol?findColIdx(src.statusCol):-1;
-  if(remainingIdx===-1){showError('Could not find the Remaining Amount column. Please check the source selection.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
   var rawRows=allRows.slice(headerIdx+1).filter(function(r){return r.some(function(c){return c!==null&&c!=='';});});
   if(!rawRows||rawRows.length===0){showError('No data rows found after the header row.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
-  // Fill-down name BEFORE filtering so customer names propagate across all sub-rows
-  if(nameIdx>-1){var lastName=null;rawRows=rawRows.map(function(row){var r=row.slice();var v=r[nameIdx];if(v!==null&&v!==undefined&&String(v).trim()!=='')lastName=String(v).trim();r[nameIdx]=lastName||'';return r;});}
-  if(src.statusCol&&src.statusVal&&statusIdx>-1){rawRows=rawRows.filter(function(row){return String(row[statusIdx]||'').trim().toLowerCase()===src.statusVal.toLowerCase();});}
-  if(src.rfpFilter){var RFP=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];rawRows=rawRows.filter(function(row){return!row.some(function(cell){return RFP.some(function(p){return p.test(String(cell||'').trim());});});});}
-  var mappedRows=rawRows.map(function(row){
-    return{name:nameIdx>-1&&row[nameIdx]!=null?String(row[nameIdx]):'',num:numIdx>-1&&row[numIdx]!=null?String(row[numIdx]):'',date:dateIdx>-1&&row[dateIdx]!=null?String(row[dateIdx]):'',amount:parseCurrency(amountIdx>-1?row[amountIdx]:null),invoicedAmount:parseCurrency(invoicedIdx>-1?row[invoicedIdx]:null),remainingAmount:parseCurrency(remainingIdx>-1?row[remainingIdx]:null)};
-  });
+  var mappedRows;
+
+  if(active==='quickbooks'){
+    // QuickBooks: original approach — col 0 is always Name; use actual header text for all other cols
+    var colMap=headerRow.map(function(h,i){return i===0?'Name':(h!==null&&h!==undefined&&String(h).trim()!=='')?String(h).trim():'__col'+i;});
+    var objRows=rawRows.map(function(r){var o={};colMap.forEach(function(col,i){o[col]=r[i]!==undefined?r[i]:null;});return o;});
+    // Fill-down name BEFORE status/RFP filtering
+    var lastName=null;
+    objRows=objRows.map(function(row){var r=Object.assign({},row),v=r['Name'];if(v!==null&&v!==undefined&&String(v).trim()!=='')lastName=String(v).trim();r['Name']=lastName||'';return r;});
+    // Status filter (case-insensitive key + value match)
+    if(src.statusCol&&src.statusVal){
+      var sKey=src.statusCol;
+      if(objRows.length>0){Object.keys(objRows[0]).forEach(function(k){if(k.toLowerCase()===src.statusCol.toLowerCase())sKey=k;});}
+      objRows=objRows.filter(function(row){return String(row[sKey]||'').trim().toLowerCase()===src.statusVal.toLowerCase();});
+    }
+    // RFP filter
+    if(src.rfpFilter){var RFP=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];objRows=objRows.filter(function(row){return!Object.values(row).some(function(cell){return RFP.some(function(p){return p.test(String(cell||'').trim());});});});}
+    // Map to internal structure using actual column names from file
+    mappedRows=objRows.map(function(row){
+      function cv(key){var found=null;Object.keys(row).forEach(function(k){if(k.toLowerCase()===key.toLowerCase())found=row[k];});return found;}
+      return{name:row['Name']||'',num:String(cv('num')||''),date:String(cv('date')||''),amount:parseCurrency(cv('amount')),invoicedAmount:parseCurrency(cv('invoiced amount')),remainingAmount:parseCurrency(cv('remaining amount'))};
+    });
+  } else {
+    // WeQuote / iPoint: column-index mapping approach
+    var fields=src.fields;
+    var normHeader=headerRow.map(function(h){return String(h||'').trim().toLowerCase().replace(/\s+/g,' ');});
+    function findColIdx(colName){if(!colName)return -1;return normHeader.indexOf(colName.toLowerCase().replace(/\s+/g,' '));}
+    var nameIdx=findColIdx(fields.name);
+    var numIdx=findColIdx(fields.num);
+    var dateIdx=fields.date?findColIdx(fields.date):-1;
+    var amountIdx=findColIdx(fields.amount);
+    var invoicedIdx=findColIdx(fields.invoicedAmount);
+    var remainingIdx=findColIdx(fields.remainingAmount);
+    var statusIdx=src.statusCol?findColIdx(src.statusCol):-1;
+    if(remainingIdx===-1){showError('Could not find the Remaining Amount column. Please check the source selection.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
+    // Fill-down name BEFORE filtering
+    if(nameIdx>-1){var lastName2=null;rawRows=rawRows.map(function(row){var r=row.slice();var v=r[nameIdx];if(v!==null&&v!==undefined&&String(v).trim()!=='')lastName2=String(v).trim();r[nameIdx]=lastName2||'';return r;});}
+    if(src.statusCol&&src.statusVal&&statusIdx>-1){rawRows=rawRows.filter(function(row){return String(row[statusIdx]||'').trim().toLowerCase()===src.statusVal.toLowerCase();});}
+    if(src.rfpFilter){var RFP2=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];rawRows=rawRows.filter(function(row){return!row.some(function(cell){return RFP2.some(function(p){return p.test(String(cell||'').trim());});});});}
+    mappedRows=rawRows.map(function(row){
+      return{name:nameIdx>-1&&row[nameIdx]!=null?String(row[nameIdx]):'',num:numIdx>-1&&row[numIdx]!=null?String(row[numIdx]):'',date:dateIdx>-1&&row[dateIdx]!=null?String(row[dateIdx]):'',amount:parseCurrency(amountIdx>-1?row[amountIdx]:null),invoicedAmount:parseCurrency(invoicedIdx>-1?row[invoicedIdx]:null),remainingAmount:parseCurrency(remainingIdx>-1?row[remainingIdx]:null)};
+    });
+  }
+
   mappedRows=mappedRows.filter(function(row){return row.remainingAmount>0;});
   if(mappedRows.length===0){showError('No qualifying rows found. Check that your file has accepted entries with a remaining balance.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
   mergeRows(mappedRows);
