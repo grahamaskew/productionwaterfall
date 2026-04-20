@@ -725,13 +725,12 @@ function buildPipelineFromRows(allRows,headerIdx){
   if(remainingIdx===-1){showError('Could not find the Remaining Amount column. Please check the source selection.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
   var rawRows=allRows.slice(headerIdx+1).filter(function(r){return r.some(function(c){return c!==null&&c!=='';});});
   if(!rawRows||rawRows.length===0){showError('No data rows found after the header row.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
+  // Fill-down name BEFORE filtering so customer names propagate across all sub-rows
+  if(nameIdx>-1){var lastName=null;rawRows=rawRows.map(function(row){var r=row.slice();var v=r[nameIdx];if(v!==null&&v!==undefined&&String(v).trim()!=='')lastName=String(v).trim();r[nameIdx]=lastName||'';return r;});}
   if(src.statusCol&&src.statusVal&&statusIdx>-1){rawRows=rawRows.filter(function(row){return String(row[statusIdx]||'').trim().toLowerCase()===src.statusVal.toLowerCase();});}
   if(src.rfpFilter){var RFP=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];rawRows=rawRows.filter(function(row){return!row.some(function(cell){return RFP.some(function(p){return p.test(String(cell||'').trim());});});});}
-  var lastName=null;
   var mappedRows=rawRows.map(function(row){
-    var nameVal=nameIdx>-1?row[nameIdx]:null;
-    if(nameVal!==null&&nameVal!==undefined&&String(nameVal).trim()!=='')lastName=String(nameVal).trim();
-    return{name:lastName||'',num:numIdx>-1&&row[numIdx]!=null?String(row[numIdx]):'',date:dateIdx>-1&&row[dateIdx]!=null?String(row[dateIdx]):'',amount:parseCurrency(amountIdx>-1?row[amountIdx]:null),invoicedAmount:parseCurrency(invoicedIdx>-1?row[invoicedIdx]:null),remainingAmount:parseCurrency(remainingIdx>-1?row[remainingIdx]:null)};
+    return{name:nameIdx>-1&&row[nameIdx]!=null?String(row[nameIdx]):'',num:numIdx>-1&&row[numIdx]!=null?String(row[numIdx]):'',date:dateIdx>-1&&row[dateIdx]!=null?String(row[dateIdx]):'',amount:parseCurrency(amountIdx>-1?row[amountIdx]:null),invoicedAmount:parseCurrency(invoicedIdx>-1?row[invoicedIdx]:null),remainingAmount:parseCurrency(remainingIdx>-1?row[remainingIdx]:null)};
   });
   mappedRows=mappedRows.filter(function(row){return row.remainingAmount>0;});
   if(mappedRows.length===0){showError('No qualifying rows found. Check that your file has accepted entries with a remaining balance.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
