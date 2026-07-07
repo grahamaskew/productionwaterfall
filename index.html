@@ -263,7 +263,8 @@
   <div class="upload-zone" id="uploadZone" style="display:none">
     <div class="source-selector" onclick="event.stopPropagation()">
       <span class="source-selector-label">Source</span>
-      <button class="source-btn" data-source="quickbooks" onclick="setActiveSource('quickbooks',event)">QuickBooks</button>
+      <button class="source-btn" data-source="quickbooks" onclick="setActiveSource('quickbooks',event)">QuickBooks Online</button>
+      <button class="source-btn" data-source="quickbooksdesktop" onclick="setActiveSource('quickbooksdesktop',event)">QuickBooks Desktop</button>
       <button class="source-btn" data-source="wequote" onclick="setActiveSource('wequote',event)">WeQuote</button>
       <button class="source-btn" data-source="ipoint" onclick="setActiveSource('ipoint',event)">iPoint</button>
     </div>
@@ -435,10 +436,16 @@ var ADMIN_EMAIL = 'gaskew44@gmail.com';
 
 var DEFAULT_SOURCE_MAPPINGS = {
   quickbooks: {
-    label:'QuickBooks',
+    label:'QuickBooks Online',
     fields:{name:'NAME',num:'NUM',date:'DATE',amount:'AMOUNT',invoicedAmount:'INVOICED AMOUNT',remainingAmount:'REMAINING AMOUNT'},
     statusCol:'STATUS', statusVal:'accepted', rfpFilter:true,
     displayNames:{name:'Name',num:'Num',date:'Date',amount:'Amount',invoicedAmount:'Invoiced Amount',remainingAmount:'Remaining Amount'}
+  },
+  quickbooksdesktop: {
+    label:'QuickBooks Desktop',
+    fields:{name:null,num:'NUM',date:'DATE',amount:'AMOUNT',invoicedAmount:null,remainingAmount:'OPEN BALANCE'},
+    statusCol:null, statusVal:null, rfpFilter:true,
+    displayNames:{name:'Name',num:'Num',date:'Date',amount:'Amount',invoicedAmount:'Invoiced Amount',remainingAmount:'Open Balance'}
   },
   wequote: {
     label:'WeQuote',
@@ -759,6 +766,42 @@ function buildPipelineFromRows(allRows,headerIdx){
     mappedRows=objRows.map(function(row){
       function cv(key){var found=null;Object.keys(row).forEach(function(k){if(k.toLowerCase()===key.toLowerCase())found=row[k];});return found;}
       return{name:row['Name']||'',num:String(cv('num')||''),date:String(cv('date')||''),amount:parseCurrency(cv('amount')),invoicedAmount:parseCurrency(cv('invoiced amount')),remainingAmount:parseCurrency(cv('remaining amount'))};
+    });
+  } else if(active==='quickbooksdesktop'){
+    // QuickBooks Desktop "Estimates by Job" style report: two-level grouping (Customer, then Job)
+    // via separate label rows, with an indented "Type"/"Estimate Active"/Date/Num/Memo/Amount/Open
+    // Balance row for each estimate. The Customer and Job groups have no header text of their own —
+    // their label columns sit two and one columns to the left of the "Type" column respectively.
+    var normHeaderQBD=headerRow.map(function(h){return String(h||'').trim().toLowerCase().replace(/\s+/g,' ');});
+    function findColIdxQBD(colName){if(!colName)return -1;return normHeaderQBD.indexOf(colName.toLowerCase().replace(/\s+/g,' '));}
+    var typeIdx=findColIdxQBD('Type');
+    var activeIdx=findColIdxQBD('Estimate Active');
+    var dateIdxQ=findColIdxQBD(src.fields.date);
+    var numIdxQ=findColIdxQBD(src.fields.num);
+    var amountIdxQ=findColIdxQBD(src.fields.amount);
+    var remainingIdxQ=findColIdxQBD(src.fields.remainingAmount);
+    if(typeIdx===-1||remainingIdxQ===-1){showError('Could not find the expected columns for QuickBooks Desktop. Please check the source selection.');hide('processing');show('uploadZone');if(uploadingFromResults)document.getElementById('uploadCancel').style.display='block';return;}
+    var jobColIdx=typeIdx-1,custColIdx=typeIdx-2;
+    var lastCustomer=null,lastJob=null,objRowsQ=[];
+    rawRows.forEach(function(row){
+      var typeVal=row[typeIdx]!==undefined&&row[typeIdx]!==null?String(row[typeIdx]).trim():'';
+      var custVal=custColIdx>-1&&row[custColIdx]!==undefined&&row[custColIdx]!==null?String(row[custColIdx]).trim():'';
+      var jobVal=jobColIdx>-1&&row[jobColIdx]!==undefined&&row[jobColIdx]!==null?String(row[jobColIdx]).trim():'';
+      if(!typeVal&&custVal&&!/^total\s/i.test(custVal)){lastCustomer=custVal;lastJob=null;return;}
+      if(!typeVal&&jobVal&&!/^total\s/i.test(jobVal)){lastJob=jobVal;return;}
+      if(typeVal.toLowerCase()==='estimate'){
+        var nm=lastCustomer?(lastCustomer+(lastJob?':'+lastJob:'')):(lastJob||'');
+        var activeVal=activeIdx>-1&&row[activeIdx]!==undefined&&row[activeIdx]!==null?String(row[activeIdx]).trim():'';
+        objRowsQ.push({row:row,name:nm,active:activeVal});
+      }
+    });
+    // Blank "Estimate Active" means the estimate isn't active/accepted — exclude it
+    objRowsQ=objRowsQ.filter(function(x){return x.active!=='';});
+    if(src.rfpFilter){var RFP3=[/rfp/i,/request\s+for\s+pay/i,/req\.?\s+for\s+pay/i,/r\.f\.p/i];objRowsQ=objRowsQ.filter(function(x){return!RFP3.some(function(p){return p.test(x.name);})&&!x.row.some(function(cell){return RFP3.some(function(p){return p.test(String(cell||'').trim());});});});}
+    mappedRows=objRowsQ.map(function(x){
+      var amt=parseCurrency(amountIdxQ>-1?x.row[amountIdxQ]:null);
+      var rem=parseCurrency(remainingIdxQ>-1?x.row[remainingIdxQ]:null);
+      return{name:x.name,num:numIdxQ>-1&&x.row[numIdxQ]!=null?String(x.row[numIdxQ]):'',date:dateIdxQ>-1&&x.row[dateIdxQ]!=null?String(x.row[dateIdxQ]):'',amount:amt,invoicedAmount:amt-rem,remainingAmount:rem};
     });
   } else {
     // WeQuote / iPoint: column-index mapping approach
