@@ -555,7 +555,7 @@ function loadUserData(uid) {
 
 function loadSharedConfig(callback) {
   db.collection('config').doc('sourceMappings').get().then(function(snap) {
-    if (snap.exists) { var data = snap.data(); if (data && data.mappings) sourceMappings = data.mappings; }
+    if (snap.exists) { var data = snap.data(); if (data && data.mappings) sourceMappings = Object.assign({}, DEFAULT_SOURCE_MAPPINGS, data.mappings); }
     if (callback) callback();
   }).catch(function(e) { console.warn('Could not load shared config:', e); if (callback) callback(); });
 }
